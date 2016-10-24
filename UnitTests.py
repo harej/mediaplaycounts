@@ -10,7 +10,7 @@ def create_table():
     read_default_file = "../my.cnf"
 
     # Opening database connection
-    conn = pymysql.connect(host="localhost",
+    conn = pymysql.connect(host="tools-db",
                            port=3306,
                            db=db,
                            read_default_file=read_default_file,
@@ -73,7 +73,7 @@ class LogProcessorStoreBasicTest(unittest.TestCase):
                   ("Another sort of video.webm", 4567)]
 
         create_table()
-        outcome = LogProcessor.store(record, date,
+        outcome = LogProcessor.store(record, date, host="tools-db",
                   "s53189__mediaplaycounts_p", "../my.cnf")
         self.assertTrue(outcome)
 
@@ -85,6 +85,6 @@ class LogProcessorStoreStressTest(unittest.TestCase):
                  for x in range(0, 99999)]
 
         create_table()
-        outcome = LogProcessor.store(record, date,
+        outcome = LogProcessor.store(record, date, host="tools-db",
                   "s53189__mediaplaycounts_p", "../my.cnf")
         self.assertTrue(outcome)
