@@ -6,7 +6,7 @@ import random
 from MediaPlaycounts import LogProcessor
 
 def create_table():
-    db = "mediaplaycounts_test"
+    db = "s53189__mediaplaycounts_test"
     read_default_file = "../my.cnf"
 
     # Opening database connection
@@ -74,7 +74,7 @@ class LogProcessorStoreBasicTest(unittest.TestCase):
 
         create_table()
         outcome = LogProcessor.store(record, date,
-                  "mediaplaycounts", "../my.cnf")
+                  "s53189__mediaplaycounts_p", "../my.cnf")
         self.assertTrue(outcome)
 
 class LogProcessorStoreStressTest(unittest.TestCase):
@@ -86,5 +86,5 @@ class LogProcessorStoreStressTest(unittest.TestCase):
 
         create_table()
         outcome = LogProcessor.store(record, date,
-                  "mediaplaycounts", "..my/test.cnf")
+                  "s53189__mediaplaycounts_p", "../my.cnf")
         self.assertTrue(outcome)
