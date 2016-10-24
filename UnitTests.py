@@ -74,7 +74,7 @@ class LogProcessorStoreBasicTest(unittest.TestCase):
 
         create_table()
         outcome = LogProcessor.store(record, date,
-                  "s53189__mediaplaycounts_p", "../.my.cnf", host="tools-db")
+                  "s53189__mediaplaycounts_test", "../.my.cnf", host="tools-db")
         self.assertTrue(outcome)
 
 class LogProcessorStoreStressTest(unittest.TestCase):
@@ -86,5 +86,5 @@ class LogProcessorStoreStressTest(unittest.TestCase):
 
         create_table()
         outcome = LogProcessor.store(record, date,
-                  "s53189__mediaplaycounts_p", "../.my.cnf", host="tools-db")
+                  "s53189__mediaplaycounts_test", "../.my.cnf", host="tools-db")
         self.assertTrue(outcome)
