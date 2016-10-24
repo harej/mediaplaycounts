@@ -7,7 +7,7 @@ from MediaPlaycounts import LogProcessor
 
 def create_table():
     db = "mediaplaycounts_test"
-    read_default_file = "testfiles/test.cnf"
+    read_default_file = "../my.cnf"
 
     # Opening database connection
     conn = pymysql.connect(host="localhost",
@@ -74,7 +74,7 @@ class LogProcessorStoreBasicTest(unittest.TestCase):
 
         create_table()
         outcome = LogProcessor.store(record, date,
-                  "mediaplaycounts", "testfiles/test.cnf")
+                  "mediaplaycounts", "../my.cnf")
         self.assertTrue(outcome)
 
 class LogProcessorStoreStressTest(unittest.TestCase):
@@ -86,5 +86,5 @@ class LogProcessorStoreStressTest(unittest.TestCase):
 
         create_table()
         outcome = LogProcessor.store(record, date,
-                  "mediaplaycounts", "testfiles/test.cnf")
+                  "mediaplaycounts", "..my/test.cnf")
         self.assertTrue(outcome)
