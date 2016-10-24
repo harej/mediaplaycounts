@@ -1,0 +1,6 @@
+*.pyc
+*.cpython-34.pyc
+.DS_Store
+testfiles/*
+__pycache__/*
+MediaPlaycounts/__pycache__/*
