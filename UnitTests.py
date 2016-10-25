@@ -5,12 +5,22 @@ import pymysql
 import random
 from MediaPlaycounts import LogProcessor
 
-def create_table():
-    db = "s53189__mediaplaycounts_test"
-    read_default_file = "../.my.cnf"
+with open("WHEREAMI") as f:
+    LOCATION = f.read()
+    if LOCATION == "Norepinephrine":
+        host = "localhost"
+        db = "mediaplaycounts"
+        read_default_file = "testfiles/test.cnf"
+    elif LOCATION == "ToolLabs":
+        host = "tools-db"
+        db = "s53189__mediaplaycounts_test"
+        read_default_file = "../.my.cnf"
+    else:
+        raise Exception
 
+def create_table():
     # Opening database connection
-    conn = pymysql.connect(host="tools-db",
+    conn = pymysql.connect(host=host,
                            port=3306,
                            db=db,
                            read_default_file=read_default_file,
@@ -35,14 +45,21 @@ def create_table():
     conn.commit()
     conn.close()
 
-#class LogProcessorDownloadTest(unittest.TestCase):
-#    # This test takes over 7 minutes to run. Use it at your peril.
-#    def test(self):
-#        try_it_out = LogProcessor.download(arrow.get('2015-01-01'))
-#
-#        with open("testfiles/mediacounts.2015-01-01.v00.tsv") as f:
-#            test_file = f.read()
-#            self.assertEqual(try_it_out, test_file)
+class LogProcessorDownloadTest(unittest.TestCase):
+    # This test takes over 7 minutes to run. Use it at your peril.
+    def test(self):
+        DO_IT = False
+
+        if DO_IT == True:
+            try_it_out = LogProcessor.download(arrow.get('2015-01-01'),
+                                               success_log="testfiles/success_log.txt",
+                                               error_log="testfiles/error_log.txt")
+
+            with open("testfiles/mediacounts.2015-01-01.v00.tsv") as f:
+                test_file = f.read()
+                self.assertEqual(try_it_out, test_file)
+        else:
+            self.assertTrue(True)
 
 
 class LogProcessorParseTest(unittest.TestCase):
@@ -69,7 +86,10 @@ class LogProcessorParseTest(unittest.TestCase):
         with open("testfiles/testfile.tsv") as f:
             log_to_test_on = f.read()
             should_result_in = [("Finally a video.webm", 584023)]
-            self.assertEqual(LogProcessor.parse(log_to_test_on), should_result_in)
+            try_it_out = LogProcessor.parse(log_to_test_on,
+                                            success_log="testfiles/success_log.txt",
+                                            error_log="testfiles/error_log.txt")
+            self.assertEqual(try_it_out, should_result_in)
 
 class LogProcessorStoreBasicTest(unittest.TestCase):
     def test(self):
@@ -78,8 +98,9 @@ class LogProcessorStoreBasicTest(unittest.TestCase):
                   ("Another sort of video.webm", 4567)]
 
         create_table()
-        outcome = LogProcessor.store(record, date,
-                  "s53189__mediaplaycounts_test", "../.my.cnf", host="tools-db")
+        outcome = LogProcessor.store(record, date, db, read_default_file, host,
+                                     success_log="testfiles/success_log.txt",
+                                     error_log="testfiles/error_log.txt")
         self.assertTrue(outcome)
 
 class LogProcessorStoreStressTest(unittest.TestCase):
@@ -90,6 +111,7 @@ class LogProcessorStoreStressTest(unittest.TestCase):
                  for x in range(0, 99999)]
 
         create_table()
-        outcome = LogProcessor.store(record, date,
-                  "s53189__mediaplaycounts_test", "../.my.cnf", host="tools-db")
+        outcome = LogProcessor.store(record, date, db, read_default_file, host,
+                                     success_log="testfiles/success_log.txt",
+                                     error_log="testfiles/error_log.txt")
         self.assertTrue(outcome)

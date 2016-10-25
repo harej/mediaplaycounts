@@ -5,8 +5,9 @@ import pymysql
 import re
 import requests
 import urllib.parse
+from . import WorkLogger
 
-def download(date):
+def download(date, success_log="success_log.txt", error_log="error_log.txt"):
     """
     Downloads and decompresses a Mediacounts logfile from dumps.wikimedia.org
     and stores it in memory for parsing.
@@ -20,12 +21,24 @@ def download(date):
 
     to_download = root_url + year_string + "/" + filename.format(date_string)
 
-    downloaded_file = requests.get(to_download).content
-    decompressed = bz2.decompress(downloaded_file)
+    try:
+        downloaded_file = requests.get(to_download).content
+    except Exception as e:
+        message = "Failed to download " + to_download + " - " + e
+        WorkLogger.error_log(message, error_log)
+
+    try:
+        decompressed = bz2.decompress(downloaded_file)
+    except Exception as e:
+        message = "Failed to decompress " + to_download + " - " + e
+        WorkLogger.error_log(message, error_log)
+
+    WorkLogger.success_log("Downloaded " + to_download, success_log)
+
     return decompressed.decode('utf-8')
 
 
-def parse(raw_log):
+def parse(raw_feed, success_log="success_log.txt", error_log="error_log.txt"):
     """
     Takes a raw, decompressed log file in string form, and returns a dictionary
     (file: count)
@@ -35,7 +48,7 @@ def parse(raw_log):
 
     ext_regex = re.compile('.*\.(mid|ogg|ogv|wav|webm|flac|oga)')
 
-    spreadsheet = raw_log.split("\n")
+    spreadsheet = raw_feed.split("\n")
     for row in spreadsheet:
         columns = row.split("\t")
         if len(columns) < 2:  # Not a real row
@@ -63,9 +76,13 @@ def parse(raw_log):
                     if re.match(ext_regex, filename) != None:
                         result.append((filename, int(playcount)))
 
+    WorkLogger.success_log("Parsed log and generated " + str(len(result)) +
+                           " records", success_log)
+
     return result
 
-def store(record, date, db, read_default_file, host="localhost", port=3306):
+def store(record, date, db, read_default_file, host="localhost", port=3306,
+          success_log="success_log.txt", error_log="error_log.txt"):
     """
     Takes the output of the parse function (the output here being referred to as
     `record`) as well as the Arrow object representing the date of the log and
@@ -108,5 +125,8 @@ def store(record, date, db, read_default_file, host="localhost", port=3306):
         cur.execute(sqlquery, megatuple)
         conn.commit()
         conn.close()
+
+    WorkLogger.success_log("Added " + str(len(record)) + " records to database",
+                           success_log)
 
     return True
