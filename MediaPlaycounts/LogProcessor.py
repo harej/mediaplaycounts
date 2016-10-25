@@ -49,7 +49,7 @@ def parse(raw_log):
         if columns[16] == '-':
             columns[16] = 0
 
-        playcount = columns[3] + columns[4] + columns[16]
+        playcount = int(columns[3]) + int(columns[4]) + int(columns[16])
 
 
         # First we must determine if this is a media file
