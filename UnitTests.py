@@ -68,7 +68,7 @@ class LogProcessorParseTest(unittest.TestCase):
 
         with open("testfiles/testfile.tsv") as f:
             log_to_test_on = f.read()
-            should_result_in = [("Finally a video.webm", 578345+1234+4444)]
+            should_result_in = [("Finally a video.webm", 584023)]
             self.assertEqual(LogProcessor.parse(log_to_test_on), should_result_in)
 
 class LogProcessorStoreBasicTest(unittest.TestCase):
