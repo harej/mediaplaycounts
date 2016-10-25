@@ -42,11 +42,11 @@ def parse(raw_log):
             continue
         base_name = columns[0]
 
-        if columns[3] = '-':
+        if columns[3] == '-':
             columns[3] = 0
-        if columns[4] = '-':
+        if columns[4] == '-':
             columns[4] = 0
-        if columns[16] = '-':
+        if columns[16] == '-':
             columns[16] = 0
 
         playcount = columns[3] + columns[4] + columns[16]
