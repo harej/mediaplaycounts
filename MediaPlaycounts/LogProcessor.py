@@ -41,7 +41,16 @@ def parse(raw_log):
         if len(columns) < 2:  # Not a real row
             continue
         base_name = columns[0]
-        playcount = columns[2]
+
+        if columns[3] = '-':
+            columns[3] = 0
+        if columns[4] = '-':
+            columns[4] = 0
+        if columns[16] = '-':
+            columns[16] = 0
+
+        playcount = columns[3] + columns[4] + columns[16]
+
 
         # First we must determine if this is a media file
         components = base_name.split("/")
@@ -68,7 +77,7 @@ def store(record, date, db, read_default_file, host="localhost", port=3306):
     # ( `id` int(11) not null auto_increment primary key, 
     # `date` varchar(255) collate utf8_bin not null,
     # `file` varchar(255) collate utf8_bin not null,
-    # `count` int(11) not null )
+    # `viewcount` int(11) not null )
     # engine=InnoDB default charset=utf8 collate=utf8_bin;
 
     date_string = date.format('YYYYMMDD')

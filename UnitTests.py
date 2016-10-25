@@ -47,13 +47,18 @@ def create_table():
 
 class LogProcessorParseTest(unittest.TestCase):
     def test(self):
-        # Actual log entries are like 25 columns long, but we only work with 0
-        # and 2 so pardon me for abbreviating.
+        # Actual log entries are like 25 columns long, but we only work with 0,
+        # 3, 4, and 16 so pardon me for abbreviating.
+
+        X = ""
 
         log_to_test_on = [
-        ["/wikipedia/commons/0/00/Not+a+video.jpg", "11111111", "22222"],
-        ["/math/0/0/0/abcdefghijklmnopqrstuvwxyz.png", "22222222", "555"],
-        ["/wikipedia/commons/a/bc/Finally+a+video.webm", "578345", "1234"]
+        ["/wikipedia/commons/0/00/Not+a+video.jpg", X, X, "11111111", "22222",
+        X, X, X, X, X, X, X, X, X, X, X, "4444"],
+        ["/math/0/0/0/abcdefghijklmnopqrstuvwxyz.png", X, X, "22222222", "555",
+        X, X, X, X, X, X, X, X, X, X, X, "4444"],
+        ["/wikipedia/commons/a/bc/Finally+a+video.webm", X, X, "578345", "1234",
+        X, X, X, X, X, X, X, X, X, X, X, "4444"]
         ]
 
         with open("testfiles/testfile.tsv", "w") as f:
@@ -63,7 +68,7 @@ class LogProcessorParseTest(unittest.TestCase):
 
         with open("testfiles/testfile.tsv") as f:
             log_to_test_on = f.read()
-            should_result_in = [("Finally a video.webm", 1234)]
+            should_result_in = [("Finally a video.webm", 578345+1234+4444)]
             self.assertEqual(LogProcessor.parse(log_to_test_on), should_result_in)
 
 class LogProcessorStoreBasicTest(unittest.TestCase):
