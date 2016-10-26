@@ -4,6 +4,7 @@ import csv
 import pymysql
 import random
 from MediaPlaycounts import LogProcessor
+from MediaPlaycounts.GetData import FilePlaycount
 
 with open("WHEREAMI") as f:
     LOCATION = f.read().strip()
@@ -42,6 +43,48 @@ def create_table():
         "engine=InnoDB default charset=utf8 collate=utf8_bin;")
 
     cur.execute(create_db_query, None)
+    conn.commit()
+    conn.close()
+
+def add_sample_data():
+    # Assumes that the above create_table() function has been run.
+
+    conn = pymysql.connect(host=host,
+                           port=3306,
+                           db=db,
+                           read_default_file=read_default_file,
+                           charset="utf8")
+    cur = conn.cursor()
+
+    q = ("insert into `counts` (`date`, `file`, `viewcount`) "
+         "values ('20150228', 'Test_case.ogg', 3), "
+         "('20150301', 'Test_case.ogg', 56);")
+
+    cur.execute(q, None)
+    conn.commit()
+    conn.close()
+
+def add_time_relative_sample_data():
+    # Assumes that the above create_table() function has been run.
+
+    conn = pymysql.connect(host=host,
+                           port=3306,
+                           db=db,
+                           read_default_file=read_default_file,
+                           charset="utf8")
+    cur = conn.cursor()
+
+    value_tuples = [(arrow.utcnow().replace(days=-x).format("YYYYMMDD"),
+                     "Relative_test_case.ogg", 13)
+                    for x in range(1, 91)]
+
+    q = "insert into `counts` (`date`, `file`, `viewcount`) values "
+
+    for thing in value_tuples:
+        q += str(thing) + ", "
+    q = q[:-2]
+
+    cur.execute(q, None)
     conn.commit()
     conn.close()
 
@@ -115,3 +158,77 @@ class LogProcessorStoreStressTest(unittest.TestCase):
                                      success_log="testfiles/success_log.txt",
                                      error_log="testfiles/error_log.txt")
         self.assertTrue(outcome)
+
+class GetDataFilePlaycountDateTest(unittest.TestCase):
+    def test(self):
+        create_table()
+        add_sample_data()
+
+        try_it_out = FilePlaycount.date("Test case.ogg", "20150228",
+                     db=db, read_default_file=read_default_file, host=host,
+                     success_log="testfiles/success_log.txt",
+                     error_log="testfiles/error_log.txt")
+
+        should_result_in = [{"filename": "Test_case.ogg", "date": "20150228",
+                            "count": 3}]
+
+        self.assertEqual(try_it_out, should_result_in)
+
+class GetDataFilePlaycountDateRangeTest(unittest.TestCase):
+    def test(self):
+        create_table()
+        add_sample_data()
+
+        try_it_out = FilePlaycount.date_range("Test case.ogg", "20150228", "20150301",
+                     db=db, read_default_file=read_default_file, host=host,
+                     success_log="testfiles/success_log.txt",
+                     error_log="testfiles/error_log.txt")
+
+        should_result_in = [{"filename": "Test_case.ogg", "date": "20150228",
+                            "count": 3},
+                            {"filename": "Test_case.ogg", "date": "20150301",
+                            "count": 56}]
+
+        self.assertEqual(try_it_out, should_result_in)
+
+class GetDataFilePlaycountLast30Test(unittest.TestCase):
+    def test(self):
+        create_table()
+        add_time_relative_sample_data()
+
+        try_it_out = FilePlaycount.last_30("Relative test case.ogg", db=db,
+                     read_default_file=read_default_file, host=host,
+                     success_log="testfiles/success_log.txt",
+                     error_log="testfiles/error_log.txt")
+
+        should_result_in = []
+
+        for x in range(1, 31):
+            to_add = {"filename": "Relative_test_case.ogg",
+                      "date": arrow.utcnow().replace(days=-x).format("YYYYMMDD"),
+                      "count": 13}
+
+            should_result_in.append(to_add)
+
+        self.assertEqual(try_it_out, should_result_in)
+
+class GetDataFilePlaycountLast90Test(unittest.TestCase):
+    def test(self):
+        create_table()
+        add_time_relative_sample_data()
+
+        try_it_out = FilePlaycount.last_90("Relative test case.ogg", db=db,
+                     read_default_file=read_default_file, host=host,
+                     success_log="testfiles/success_log.txt",
+                     error_log="testfiles/error_log.txt")
+
+        should_result_in = []
+
+        for x in range(1, 91):
+            to_add = {"filename": "Relative_test_case.ogg",
+                      "date": arrow.utcnow().replace(days=-x).format("YYYYMMDD"),
+                      "count": 13}
+
+            should_result_in.append(to_add)
+
+        self.assertEqual(try_it_out, should_result_in)

@@ -14,5 +14,5 @@ def run(read_default_file, db="mediaplaycounts",
         record = LogProcessor.parse(raw_log)
         LogProcessor.store(record, date, db, read_default_file, host, port)
 
- if __name__ == '__main__':
+if __name__ == '__main__':
     run("../.my.cnf", db="s53189__mediaplaycounts_p", host="tools-db")
