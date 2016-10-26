@@ -6,7 +6,7 @@ import random
 from MediaPlaycounts import LogProcessor
 
 with open("WHEREAMI") as f:
-    LOCATION = f.read()
+    LOCATION = f.read().strip()
     if LOCATION == "Norepinephrine":
         host = "localhost"
         db = "mediaplaycounts"
