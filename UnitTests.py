@@ -4,7 +4,7 @@ import csv
 import pymysql
 import random
 from MediaPlaycounts import LogProcessor
-from MediaPlaycounts.GetData import FilePlaycount
+from MediaPlaycounts.GetData import AskCommons, FilePlaycount
 
 with open("WHEREAMI") as f:
     LOCATION = f.read().strip()
@@ -212,7 +212,7 @@ class GetDataFilePlaycountLast30Test(unittest.TestCase):
 
         self.assertEqual(try_it_out, should_result_in)
 
-class GetDataFilePlaycountLast90Test(unittest.TestCase):
+class FilePlaycountLast90Test(unittest.TestCase):
     def test(self):
         create_table()
         add_time_relative_sample_data()
@@ -230,5 +230,24 @@ class GetDataFilePlaycountLast90Test(unittest.TestCase):
                       "count": 13}
 
             should_result_in.append(to_add)
+
+        self.assertEqual(try_it_out, should_result_in)
+
+class AskCommonsFindSubCategoriesTest(unittest.TestCase):
+    def test(self):
+        # NOTE: This test should be rewritten to use a "fake Commons". Currently
+        # testing with the real Commons to see if the thing even works.
+
+        category = "National Institute for Occupational Safety and Health"
+
+        try_it_out = AskCommons(category, success_log="testfiles/success_log.txt",
+                                error_log="testfiles/error_log.txt")
+
+        should_result_in = ["John_Howard_(public_health_administrator)",
+                            "John_Howard_at_WikiConference_USA_2015",
+                            "National_Institute_for_Occupational_Safety_and_Health_publications",
+                            "National_Institute_for_Occupational_Safety_and_Health_videos",
+                            "National_Institute_for_Occupational_Safety_and_Health_sound_recordings",
+                            "Power_tool_noise_and_vibration_tests_by_the_National_Institute_for_Occupational_Safety_and_Health"]
 
         self.assertEqual(try_it_out, should_result_in)
