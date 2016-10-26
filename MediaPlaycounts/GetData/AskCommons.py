@@ -84,7 +84,7 @@ def find_media_files(category, db="commonswiki_p", host="commonswiki.labsdb",
 
     ext_regex = re.compile('.*\.(mid|ogg|ogv|wav|webm|flac|oga)')
     for result in results:
-        filename = result[0]
+        filename = result[0].decode("utf-8")
         if re.match(ext_regex, filename) != None:
             filelist.append(filename)
 
