@@ -1,6 +1,4 @@
-import arrow
-import pymysql
-from . import AskCommons
+from . import AskCommons, FilePlaycount
 
 def _recursive_media_finder(category, depth=9, read_default_file="../.my.cnf",
                             host="commonswiki.labsdb", port=3306, db="commonswiki_p",
@@ -40,28 +38,115 @@ def date(category, date, depth=9, db="s53189__mediaplaycounts_p",
          success_log="success_log.txt", error_log="error_log.txt"):
     """
     Gets playcounts for a category of files (with recursion) on a specific date.
-    Date must be a string in the format YYYY-MM-DD and the category must be without
+    Date must be a string in the format YYYYMMDD and the category must be without
     the "Category:" prefix.
     """
 
+    output = []
+
     # Normalizing
-    date = arrow.get(date)
     category = category.replace(" ", "_")
 
+    file_list = _recursive_media_finder(category, depth=depth,
+                    read_default_file=read_default_file,
+                    host=commons_host, port=3306, db=commons_db,
+                    success_log=success_log, error_log=error_log)
 
+    for filename in file_list:
+        subquery = FilePlaycount.date(filename, date, db=db,
+                       read_default_file=read_default_file, host=host, port=port,
+                       success_log=success_log, error_log=error_log)
+        for result in subquery:
+            output.append(result)
 
-    return None
+    return output
 
+def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycounts_p",
+                  read_default_file="../.my.cnf", host="tools-db", port=3306,
+                  commons_db="commonswiki_p", commons_host="commonswiki.labsdb",
+                  commons_port=3306, success_log="success_log.txt", error_log="error_log.txt"):
 
+    """
+    Gets playcounts for a category of files (with recursion) for a range of dates,
+    inclusive. Date must be a string in the format YYYYMMDD and the category must
+    be without the "Category:" prefix.
+    """
 
-def date_range():
-    return None
+    output = []
 
-def last_30():
-    return None
+    # Normalizing
+    category = category.replace(" ", "_")
 
-def last_90():
-    return None
+    file_list = _recursive_media_finder(category, depth=depth,
+                    read_default_file=read_default_file,
+                    host=commons_host, port=3306, db=commons_db,
+                    success_log=success_log, error_log=error_log)
 
-def all_time():
-    return None
+    for filename in file_list:
+        subquery = FilePlaycount.date_range(filename, start_date, end_date, db=db,
+                       read_default_file=read_default_file, host=host, port=port,
+                       success_log=success_log, error_log=error_log)
+        for result in subquery:
+            output.append(result)
+
+    return output
+
+def last_30(category, depth=9, db="s53189__mediaplaycounts_p",
+               read_default_file="../.my.cnf", host="tools-db", port=3306,
+               commons_db="commonswiki_p", commons_host="commonswiki.labsdb",
+               commons_port=3306, success_log="success_log.txt", error_log="error_log.txt"):
+
+    """
+    Gets playcounts for a category of files (with recursion) for the last 30 days,
+    starting with yesterday and going back 30 days from there. The category must
+    be without the "Category:" prefix.
+    """
+
+    output = []
+
+    # Normalizing
+    category = category.replace(" ", "_")
+
+    file_list = _recursive_media_finder(category, depth=depth,
+                    read_default_file=read_default_file,
+                    host=commons_host, port=3306, db=commons_db,
+                    success_log=success_log, error_log=error_log)
+
+    for filename in file_list:
+        subquery = FilePlaycount.last_30(filename, db=db,
+                       read_default_file=read_default_file, host=host, port=port,
+                       success_log=success_log, error_log=error_log)
+        for result in subquery:
+            output.append(result)
+
+    return output
+
+def last_90(category, depth=9, db="s53189__mediaplaycounts_p",
+               read_default_file="../.my.cnf", host="tools-db", port=3306,
+               commons_db="commonswiki_p", commons_host="commonswiki.labsdb",
+               commons_port=3306, success_log="success_log.txt", error_log="error_log.txt"):
+
+    """
+    Gets playcounts for a category of files (with recursion) for the last 90 days,
+    starting with yesterday and going back 30 days from there. The category must
+    be without the "Category:" prefix.
+    """
+
+    output = []
+
+    # Normalizing
+    category = category.replace(" ", "_")
+
+    file_list = _recursive_media_finder(category, depth=depth,
+                    read_default_file=read_default_file,
+                    host=commons_host, port=3306, db=commons_db,
+                    success_log=success_log, error_log=error_log)
+
+    for filename in file_list:
+        subquery = FilePlaycount.last_90(filename, db=db,
+                       read_default_file=read_default_file, host=host, port=port,
+                       success_log=success_log, error_log=error_log)
+        for result in subquery:
+            output.append(result)
+
+    return output
