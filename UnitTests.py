@@ -646,6 +646,7 @@ class RecursiveMediaFinderTest(unittest.TestCase):
                             "Handling_Explosives_in_Underground_Mines.webm",
                             "Know_Your_Nailer-_Nail_Gun_Safety.webm",
                             "Indium_Lung_Disease.webm",
+                            "Indium_Lung_Disease.ogv",
                             "Man_Overboard_Prevention_and_Recovery.webm",
                             "NIOSH_Health_Hazard_Evaluations-_Sampling_for_Exposures.webm",
                             "NIOSH_Nano_Research_-_Engineering_Controls_for_Nanomaterial_Production_and_Handling_Processes.webm",
