@@ -662,7 +662,8 @@ class RecursiveMediaFinderTest(unittest.TestCase):
                             "Take_Pride_in_Your_Job_-_Fall_Protection.webm",
                             "What_it_Means_to_be_NIOSH-Approved_-_A_look_into_N95_Certification_Testing.webm",
                             "Take_Pride_in_Your_Job_-_Seat_Belts.webm",
-                            "Zen_and_the_Art_of_Rockbolting.webm"]
+                            "Zen_and_the_Art_of_Rockbolting.webm",
+                            "Special_Remarks_by_Dr._John_Howard_at_WikiConference_USA_2015.webm"]
 
         should_result_in.sort()
 
