@@ -254,3 +254,48 @@ class AskCommonsFindSubCategoriesTest(unittest.TestCase):
         should_result_in.sort()
 
         self.assertEqual(try_it_out, should_result_in)
+
+class AskCommonsFindMediaFilesTest(unittest.TestCase):
+    def test(self):
+        # NOTE: This test should be rewritten to use a "fake Commons". Currently
+        # testing with the real Commons to see if the thing even works.
+
+        category = "National Institute for Occupational Safety and Health videos"
+
+        try_it_out = AskCommons.find_media_files(category,
+                     success_log="testfiles/success_log.txt",
+                     error_log="testfiles/error_log.txt")
+
+        should_result_in = ["A_construction_framer_talks_about_protecting_his_crew_from_falls.webm",
+                            "Anthrax_surface_sampling_-_How_to_sample_with_cellulose_sponge_on_nonporous_surfaces.webm",
+                            "Anthrax_surface_sampling-_How_to_sample_with_macrofoam_swab_on_nonporous_surfaces.webm",
+                            "Buy_Quiet_–_For_Manufacturers.webm",
+                            "Buy_Quiet_Construction_Video.webm",
+                            "Efficacy_of_Face_Shields_Against_Cough_Aerosol_Droplets_from_a_Cough_Simulator.webm",
+                            "Cutting_fiber_cement_siding_--_silica_dust_and_lung_disease.webm",
+                            "Emergency_Responder_Health_Monitoring_and_Surveillance_Overview.webm",
+                            "Hand_Arm_Vibration_Study.webm",
+                            "Escape_From_Farmington_No_9_An_Oral_History.webm",
+                            "Healthcare_worker_protective_research-_Is_flushing_the_toilet_hazardous-.webm",
+                            "How_Poison_Ivy_Works.webm",
+                            "Handling_Explosives_in_Underground_Mines.webm",
+                            "Know_Your_Nailer-_Nail_Gun_Safety.webm",
+                            "Indium_Lung_Disease.webm",
+                            "Man_Overboard_Prevention_and_Recovery.webm",
+                            "NIOSH_Health_Hazard_Evaluations-_Sampling_for_Exposures.webm",
+                            "NIOSH_Nano_Research_-_Engineering_Controls_for_Nanomaterial_Production_and_Handling_Processes.webm",
+                            "NIOSH_No_Nose_Saddle_Explained.webm",
+                            "Nurses_Voices_(Unit_2)_from_NIOSH_Workplace_Violence_Prevention_for_Nurses_Course.webm",
+                            "Occupational_Ladder_Fall_Injuries_—_United_States,_2011.webm",
+                            "Move_It_Rig_Move_Safety_for_Roughnecks.webm",
+                            "Reducing_Dust_inside_Enclosed_Cabs.webm",
+                            "Move_It_Rig_Move_Safety_for_Truckers.webm",
+                            "Respirator_Certification_-_As_Vital_as_the_Air_We_Breathe.webm",
+                            "Sleep_Deprivation_–_Shift_Work_&_Long_Work_Hours_Put_Nurses_at_Risk.webm",
+                            "Rock_Falls_-_Preventing_Rock_Fall_Injuries_in_Underground_Mines.webm",
+                            "Take_Pride_in_Your_Job_-_Fall_Protection.webm",
+                            "What_it_Means_to_be_NIOSH-Approved_-_A_look_into_N95_Certification_Testing.webm",
+                            "Take_Pride_in_Your_Job_-_Seat_Belts.webm",
+                            "Zen_and_the_Art_of_Rockbolting.webm"]
+
+        self.assertEqual(try_it_out, should_result_in)
