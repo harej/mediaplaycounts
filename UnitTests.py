@@ -240,7 +240,8 @@ class AskCommonsFindSubCategoriesTest(unittest.TestCase):
 
         category = "National Institute for Occupational Safety and Health"
 
-        try_it_out = AskCommons(category, success_log="testfiles/success_log.txt",
+        try_it_out = AskCommons.find_subcategories(category,
+                                success_log="testfiles/success_log.txt",
                                 error_log="testfiles/error_log.txt")
 
         should_result_in = ["John_Howard_(public_health_administrator)",
