@@ -76,7 +76,7 @@ def find_media_files(category, db="commonswiki_p", host="commonswiki.labsdb",
     q = ("select page_title from page join categorylinks on cl_from = page_id "
          "where page_namespace=6 and cl_to = %s;")
 
-    params = (category)
+    params = (category.replace(" ", "_"))
 
     results = _query(q, params, db="commonswiki_p", host="commonswiki.labsdb",
                      read_default_file=read_default_file, port=3306,
