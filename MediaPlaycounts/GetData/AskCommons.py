@@ -53,7 +53,8 @@ def find_subcategories(category, depth=9, db="commonswiki_p",
         more = find_subcategories(val, depth=depth-1, db=db,
                            host=host, read_default_file=read_default_file, port=port,
                            success_log=success_log, error_log=error_log)
-        for more_result in more:
-            categorylist.append(more_result)
+        if more != None:
+            for more_result in more:
+                categorylist.append(more_result)
 
     return list(set(categorylist)).sort()
