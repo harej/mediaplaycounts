@@ -56,4 +56,4 @@ def find_subcategories(category, depth=9, db="commonswiki_p",
         for more_result in more:
             categorylist.append(more_result)
 
-    return list(set(categorylist))
+    return list(set(categorylist)).sort()

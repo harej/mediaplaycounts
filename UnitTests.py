@@ -251,4 +251,6 @@ class AskCommonsFindSubCategoriesTest(unittest.TestCase):
                             "National_Institute_for_Occupational_Safety_and_Health_sound_recordings",
                             "Power_tool_noise_and_vibration_tests_by_the_National_Institute_for_Occupational_Safety_and_Health"]
 
+        should_result_in.sort()
+
         self.assertEqual(try_it_out, should_result_in)
