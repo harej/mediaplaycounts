@@ -268,7 +268,7 @@ class AskCommonsFindMediaFilesTest(unittest.TestCase):
 
         should_result_in = ["A_construction_framer_talks_about_protecting_his_crew_from_falls.webm",
                             "Anthrax_surface_sampling_-_How_to_sample_with_cellulose_sponge_on_nonporous_surfaces.webm",
-                            "Anthrax_surface_sampling_-_How_to_sample_with_macrofoam_swab_on_nonporous_surfaces.webm",
+                            "Anthrax_surface_sampling-_How_to_sample_with_macrofoam_swab_on_nonporous_surfaces.webm",
                             "Buy_Quiet_–_For_Manufacturers.webm",
                             "Buy_Quiet_Construction_Video.webm",
                             "Efficacy_of_Face_Shields_Against_Cough_Aerosol_Droplets_from_a_Cough_Simulator.webm",
@@ -297,5 +297,7 @@ class AskCommonsFindMediaFilesTest(unittest.TestCase):
                             "What_it_Means_to_be_NIOSH-Approved_-_A_look_into_N95_Certification_Testing.webm",
                             "Take_Pride_in_Your_Job_-_Seat_Belts.webm",
                             "Zen_and_the_Art_of_Rockbolting.webm"]
+
+        should_result_in.sort()
 
         self.assertEqual(try_it_out, should_result_in)
