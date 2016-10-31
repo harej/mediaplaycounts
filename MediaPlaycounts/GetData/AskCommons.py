@@ -3,7 +3,7 @@ import pymysql
 import re
 
 directory = os.path.dirname(__file__)
-sqlconfig = os.path.join(directory, "../.my.cnf")
+sqlconfig = os.path.join(directory, "../../.my.cnf")
 
 def _query(query, params, db="commonswiki_p", host="commonswiki.labsdb",
            read_default_file=sqlconfig, port=3306,

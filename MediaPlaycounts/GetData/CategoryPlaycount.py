@@ -2,7 +2,7 @@ import os
 from . import AskCommons, FilePlaycount
 
 directory = os.path.dirname(__file__)
-sqlconfig = os.path.join(directory, "../.my.cnf")
+sqlconfig = os.path.join(directory, "../../.my.cnf")
 
 def _recursive_media_finder(category, depth=9, read_default_file=sqlconfig,
                             host="commonswiki.labsdb", port=3306, db="commonswiki_p",

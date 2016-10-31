@@ -3,7 +3,7 @@ import os
 import pymysql
 
 directory = os.path.dirname(__file__)
-sqlconfig = os.path.join(directory, "../.my.cnf")
+sqlconfig = os.path.join(directory, "../../.my.cnf")
 
 def date(filename, date, db="s53189__mediaplaycounts_p", read_default_file=sqlconfig,
          host="tools-db", port=3306, success_log="success_log.txt", error_log="error_log.txt"):

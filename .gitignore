@@ -5,3 +5,4 @@ WHEREAMI
 testfiles/*
 __pycache__/*
 MediaPlaycounts/__pycache__/*
+.my.cnf
