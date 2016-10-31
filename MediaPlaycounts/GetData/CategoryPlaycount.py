@@ -63,7 +63,7 @@ def date(category, date, depth=9, db="s53189__mediaplaycounts_p",
                        success_log=success_log, error_log=error_log)
         output.append(subquery[0])
         for triplet in output:
-            total += triplet["output"]
+            total += triplet["count"]
 
     return {"total": total, "details": output}
 
