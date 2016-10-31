@@ -62,8 +62,8 @@ def date(category, date, depth=9, db="s53189__mediaplaycounts_p",
                        read_default_file=read_default_file, host=host, port=port,
                        success_log=success_log, error_log=error_log)
         output.append(subquery[0])
-        for triplet in output:
-            total += triplet["count"]
+    for triplet in output:
+        total += triplet["count"]
 
     return {"total": total, "details": output}
 
@@ -98,8 +98,8 @@ def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycou
 
         output.append({"total": subtotal, "details": subquery})
 
-        for blob in subquery:
-            total += subquery["total"]
+    for blob in output:
+        total += blob["total"]
 
     return {"total": total, "details": output}
 
