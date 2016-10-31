@@ -79,6 +79,7 @@ def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycou
     """
 
     output = []
+    total = 0
 
     # Normalizing
     category = category.replace(" ", "_")
