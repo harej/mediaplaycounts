@@ -1,7 +1,11 @@
 import arrow
+import os
 import pymysql
 
-def date(filename, date, db="s53189__mediaplaycounts_p", read_default_file="../.my.cnf",
+directory = os.path.dirname(__file__)
+sqlconfig = os.path.join(directory, "../.my.cnf")
+
+def date(filename, date, db="s53189__mediaplaycounts_p", read_default_file=sqlconfig,
          host="tools-db", port=3306, success_log="success_log.txt", error_log="error_log.txt"):
     """
     Gets playcounts for an individual file on a specific date. Date must be a
@@ -36,7 +40,7 @@ def date(filename, date, db="s53189__mediaplaycounts_p", read_default_file="../.
 
 
 def date_range(filename, start_date, end_date, db="s53189__mediaplaycounts_p",
-               read_default_file="../.my.cnf", host="tools-db", port=3306,
+               read_default_file=sqlconfig, host="tools-db", port=3306,
                success_log="success_log.txt", error_log="error_log.txt"):
     """
     Gets playcounts for an individual file for a range of dates, inclusive.
@@ -73,7 +77,7 @@ def date_range(filename, start_date, end_date, db="s53189__mediaplaycounts_p",
 
 
 def last_30(filename, db="s53189__mediaplaycounts_p",
-            read_default_file="../.my.cnf", host="tools-db", port=3306,
+            read_default_file=sqlconfig, host="tools-db", port=3306,
             success_log="success_log.txt", error_log="error_log.txt"):
     """
     Gets playcounts for an individual file for the last 30 days, starting with
@@ -90,7 +94,7 @@ def last_30(filename, db="s53189__mediaplaycounts_p",
                       success_log=success_log, error_log=error_log)
 
 def last_90(filename, db="s53189__mediaplaycounts_p",
-            read_default_file="../.my.cnf", host="tools-db", port=3306,
+            read_default_file=sqlconfig, host="tools-db", port=3306,
             success_log="success_log.txt", error_log="error_log.txt"):
     """
     Gets playcounts for an individual file for the last 90 days, starting with

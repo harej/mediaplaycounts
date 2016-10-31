@@ -1,8 +1,12 @@
+import os
 import pymysql
 import re
 
+directory = os.path.dirname(__file__)
+sqlconfig = os.path.join(directory, "../.my.cnf")
+
 def _query(query, params, db="commonswiki_p", host="commonswiki.labsdb",
-           read_default_file="../.my.cnf", port=3306,
+           read_default_file=sqlconfig, port=3306,
            success_log="success_log.txt", error_log="error_log.txt"):
     """
     Helper function to perform database queries
@@ -28,7 +32,7 @@ def _query(query, params, db="commonswiki_p", host="commonswiki.labsdb",
     return data
 
 def find_subcategories(category, depth=9, db="commonswiki_p",
-                       host="commonswiki.labsdb", read_default_file="../.my.cnf",
+                       host="commonswiki.labsdb", read_default_file=sqlconfig,
                        port=3306, success_log="success_log.txt", error_log="error_log.txt"):
     """
     Finds subcategories of a given category up to the provided depth. Category
@@ -62,7 +66,7 @@ def find_subcategories(category, depth=9, db="commonswiki_p",
     return categorylist
 
 def find_media_files(category, db="commonswiki_p", host="commonswiki.labsdb",
-                     read_default_file="../.my.cnf", port=3306,
+                     read_default_file=sqlconfig, port=3306,
                      success_log="success_log.txt", error_log="error_log.txt"):
     """
     Generates a list of media files for a single category. Use the find_subcategories

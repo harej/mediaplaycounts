@@ -1,6 +1,10 @@
+import os
 from . import AskCommons, FilePlaycount
 
-def _recursive_media_finder(category, depth=9, read_default_file="../.my.cnf",
+directory = os.path.dirname(__file__)
+sqlconfig = os.path.join(directory, "../.my.cnf")
+
+def _recursive_media_finder(category, depth=9, read_default_file=sqlconfig,
                             host="commonswiki.labsdb", port=3306, db="commonswiki_p",
                             success_log="success_log.txt", error_log="error_log.txt"):
     """
@@ -33,7 +37,7 @@ def _recursive_media_finder(category, depth=9, read_default_file="../.my.cnf",
     return manifest
 
 def date(category, date, depth=9, db="s53189__mediaplaycounts_p",
-         read_default_file="../.my.cnf", host="tools-db", port=3306,
+         read_default_file=sqlconfig, host="tools-db", port=3306,
          commons_db="commonswiki_p", commons_host="commonswiki.labsdb", commons_port=3306,
          success_log="success_log.txt", error_log="error_log.txt"):
     """
@@ -62,7 +66,7 @@ def date(category, date, depth=9, db="s53189__mediaplaycounts_p",
     return output
 
 def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycounts_p",
-                  read_default_file="../.my.cnf", host="tools-db", port=3306,
+                  read_default_file=sqlconfig, host="tools-db", port=3306,
                   commons_db="commonswiki_p", commons_host="commonswiki.labsdb",
                   commons_port=3306, success_log="success_log.txt", error_log="error_log.txt"):
 
@@ -92,7 +96,7 @@ def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycou
     return output
 
 def last_30(category, depth=9, db="s53189__mediaplaycounts_p",
-               read_default_file="../.my.cnf", host="tools-db", port=3306,
+               read_default_file=sqlconfig, host="tools-db", port=3306,
                commons_db="commonswiki_p", commons_host="commonswiki.labsdb",
                commons_port=3306, success_log="success_log.txt", error_log="error_log.txt"):
 
@@ -122,7 +126,7 @@ def last_30(category, depth=9, db="s53189__mediaplaycounts_p",
     return output
 
 def last_90(category, depth=9, db="s53189__mediaplaycounts_p",
-               read_default_file="../.my.cnf", host="tools-db", port=3306,
+               read_default_file=sqlconfig, host="tools-db", port=3306,
                commons_db="commonswiki_p", commons_host="commonswiki.labsdb",
                commons_port=3306, success_log="success_log.txt", error_log="error_log.txt"):
 
