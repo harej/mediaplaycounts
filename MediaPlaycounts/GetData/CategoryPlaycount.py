@@ -92,9 +92,7 @@ def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycou
         subquery = FilePlaycount.date_range(filename, start_date, end_date, db=db,
                        read_default_file=read_default_file, host=host, port=port,
                        success_log=success_log, error_log=error_log)
-        subtotal = 0
-        for result in subquery:
-            subtotal += result["total"]
+        subtotal = result["total"]
 
         output.append({"total": subtotal, "details": subquery})
 
