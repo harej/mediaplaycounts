@@ -94,7 +94,7 @@ def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycou
                        success_log=success_log, error_log=error_log)
         subtotal = subquery["total"]
 
-        output.append({"total": subtotal, "details": subquery})
+        output.append({"filename": filename, "total": subtotal, "details": subquery})
 
     for blob in output:
         total += blob["total"]
