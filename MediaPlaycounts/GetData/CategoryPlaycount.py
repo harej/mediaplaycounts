@@ -62,8 +62,7 @@ def date(category, date, depth=9, db="s53189__mediaplaycounts_p",
                        read_default_file=read_default_file, host=host, port=port,
                        success_log=success_log, error_log=error_log)
         output.append({"filename": filename, "details": subquery[0]})
-    for triplet in output:
-        total += triplet["count"]
+        total += subquery[0]["count"]
 
     return {"total": total, "details": output}
 
