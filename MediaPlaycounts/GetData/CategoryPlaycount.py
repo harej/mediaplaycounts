@@ -61,8 +61,9 @@ def date(category, date, depth=9, db="s53189__mediaplaycounts_p",
         subquery = FilePlaycount.date(filename, date, db=db,
                        read_default_file=read_default_file, host=host, port=port,
                        success_log=success_log, error_log=error_log)
-        output.append({"filename": filename, "details": subquery[0]})
-        total += subquery[0]["count"]
+        for result in subquery:
+            output.append({"filename": filename, "details": result})
+            total += result["count"]
 
     return {"total": total, "details": output}
 
