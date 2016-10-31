@@ -37,7 +37,7 @@ def create_table():
     create_db_query = \
         ("create table `counts` "
          "( `id` int(11) not null auto_increment primary key, "
-         "`date` varchar(255) collate utf8_bin not null, "
+         "`date` varchar(8) collate utf8_bin not null, "
          "`file` varchar(255) collate utf8_bin not null, "
          "`viewcount` int(11) not null ) "
         "engine=InnoDB default charset=utf8 collate=utf8_bin;")
@@ -189,6 +189,8 @@ class GetDataFilePlaycountDateRangeTest(unittest.TestCase):
                             {"filename": "Test_case.ogg", "date": "20150301",
                             "count": 56}]
 
+        should_result_in = {"total": 59, "details": should_result_in}
+
         self.assertEqual(try_it_out, should_result_in)
 
 class GetDataFilePlaycountLast30Test(unittest.TestCase):
@@ -210,6 +212,8 @@ class GetDataFilePlaycountLast30Test(unittest.TestCase):
 
             should_result_in.append(to_add)
 
+        should_result_in = {"total": 13*30, "details": should_result_in}
+
         self.assertEqual(try_it_out, should_result_in)
 
 class FilePlaycountLast90Test(unittest.TestCase):
@@ -230,6 +234,8 @@ class FilePlaycountLast90Test(unittest.TestCase):
                       "count": 13}
 
             should_result_in.append(to_add)
+
+        should_result_in = {"total": 13*90, "details": should_result_in}
 
         self.assertEqual(try_it_out, should_result_in)
 

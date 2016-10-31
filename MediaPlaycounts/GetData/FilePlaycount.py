@@ -73,7 +73,11 @@ def date_range(filename, start_date, end_date, db="s53189__mediaplaycounts_p",
 
     conn.close()
 
-    return data
+    total = 0
+    for triplet in data:
+        total += triplet["count"]
+
+    return {"total": total, "details": data}
 
 
 def last_30(filename, db="s53189__mediaplaycounts_p",

@@ -56,14 +56,16 @@ def date(category, date, depth=9, db="s53189__mediaplaycounts_p",
                     host=commons_host, port=3306, db=commons_db,
                     success_log=success_log, error_log=error_log)
 
+    total = 0
     for filename in file_list:
         subquery = FilePlaycount.date(filename, date, db=db,
                        read_default_file=read_default_file, host=host, port=port,
                        success_log=success_log, error_log=error_log)
-        for result in subquery:
-            output.append(result)
+        output.append(subquery)
+        for blob in subquery:
+            total += subquery["count"]
 
-    return output
+    return {"total": total, "details": output}
 
 def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycounts_p",
                   read_default_file=sqlconfig, host="tools-db", port=3306,
@@ -90,10 +92,11 @@ def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycou
         subquery = FilePlaycount.date_range(filename, start_date, end_date, db=db,
                        read_default_file=read_default_file, host=host, port=port,
                        success_log=success_log, error_log=error_log)
-        for result in subquery:
-            output.append(result)
+        output.append(subquery)
+        for blob in subquery:
+            total += subquery["count"]
 
-    return output
+    return {"total": total, "details": output}
 
 def last_30(category, depth=9, db="s53189__mediaplaycounts_p",
                read_default_file=sqlconfig, host="tools-db", port=3306,

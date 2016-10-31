@@ -92,7 +92,7 @@ def store(record, date, db, read_default_file, host="localhost", port=3306,
 
     # create table `counts` 
     # ( `id` int(11) not null auto_increment primary key, 
-    # `date` varchar(255) collate utf8_bin not null,
+    # `date` varchar(8) collate utf8_bin not null,
     # `file` varchar(255) collate utf8_bin not null,
     # `viewcount` int(11) not null )
     # engine=InnoDB default charset=utf8 collate=utf8_bin;
