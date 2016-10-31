@@ -63,7 +63,7 @@ def date(category, date, depth=9, db="s53189__mediaplaycounts_p",
                        success_log=success_log, error_log=error_log)
         output.append(subquery)
         for blob in subquery:
-            total += subquery["count"]
+            total += subquery["count"][0]
 
     return {"total": total, "details": output}
 
@@ -94,7 +94,7 @@ def date_range(category, start_date, end_date, depth=9, db="s53189__mediaplaycou
                        success_log=success_log, error_log=error_log)
         subtotal = 0
         for result in subquery:
-            subtotal += result["count"]
+            subtotal += result["total"]
 
         output.append({"total": subtotal, "details": subquery})
 
