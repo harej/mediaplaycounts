@@ -72,7 +72,7 @@ def date_range(filename, start_date, end_date, db="s53189__mediaplaycounts_p",
             data.append({"filename": filename, "date": result[0], "count": result[1]})
 
     conn.close()
-
+ 
     total = 0
     for triplet in data:
         total += triplet["count"]

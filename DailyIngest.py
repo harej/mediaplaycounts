@@ -1,5 +1,5 @@
 import arrow
-from MediaPlaycounts import LogProcessor, WorkLogger
+from MediaPlaycounts import LogProcessor
 
 def run(read_default_file, db="mediaplaycounts",
         dates=[arrow.utcnow().replace(days=-1)], host="localhost", port=3306):
@@ -15,4 +15,4 @@ def run(read_default_file, db="mediaplaycounts",
         LogProcessor.store(record, date, db, read_default_file, host, port)
 
 if __name__ == '__main__':
-    run("../.my.cnf", db="s53189__mediaplaycounts_p", host="tools-db")
+    run(".my.cnf", db="s53189__mediaplaycounts_p", host="tools-db")
