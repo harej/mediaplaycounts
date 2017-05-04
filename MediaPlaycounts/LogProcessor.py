@@ -7,39 +7,6 @@ import requests
 import urllib.parse
 from . import WorkLogger
 
-def download(date, success_log="success_log.txt", error_log="error_log.txt"):
-    """
-    Downloads and decompresses a Mediacounts logfile from dumps.wikimedia.org
-    and stores it in memory for parsing.
-    Requires an Arrow date object.
-    Returns a relative path to the file.
-    """
-    root_url = "https://dumps.wikimedia.org/other/mediacounts/daily/"
-    filename = "mediacounts.{0}.v00.tsv.bz2"
-    date_string = date.format('YYYY-MM-DD')
-    year_string = date.format('YYYY')
-
-    to_download = root_url + year_string + "/" + filename.format(date_string)
-
-    try:
-        downloaded_file = requests.get(to_download).content
-    except Exception as e:
-        message = "Failed to download " + to_download + " - " + e
-        WorkLogger.error_log(message, error_log)
-
-    try:
-        decompressed = bz2.decompress(downloaded_file)
-    except Exception as e:
-        message = "Failed to decompress " + to_download + " - " + e
-        WorkLogger.error_log(message, error_log)
-
-    decompressed = decompressed.decode('utf-8').split('\n')
-
-    for line in decompressed:
-        yield line
-
-    WorkLogger.success_log("Downloaded and parsed " + to_download, success_log)
-
 def parse(row, success_log="success_log.txt", error_log="error_log.txt"):
     """
     Takes a line from a raw, decompressed log file and returns a tuple
@@ -73,6 +40,37 @@ def parse(row, success_log="success_log.txt", error_log="error_log.txt"):
                 filename = urllib.parse.unquote_plus(components[5])
                 if re.match(ext_regex, filename) != None:
                     return (filename, int(playcount))
+
+def download(date, success_log="success_log.txt", error_log="error_log.txt"):
+    """
+    Downloads, decompresses, and parses a Mediacounts logfile from dumps.wikimedia.org
+    and stores it in memory for parsing.
+    Requires an Arrow date object.
+    Returns a relative path to the file.
+    """
+    root_url = "https://dumps.wikimedia.org/other/mediacounts/daily/"
+    filename = "mediacounts.{0}.v00.tsv.bz2"
+    date_string = date.format('YYYY-MM-DD')
+    year_string = date.format('YYYY')
+
+    to_download = root_url + year_string + "/" + filename.format(date_string)
+
+    try:
+        downloaded_file = requests.get(to_download).content
+    except Exception as e:
+        message = "Failed to download " + to_download + " - " + e
+        WorkLogger.error_log(message, error_log)
+
+    try:
+        decompressed = bz2.decompress(downloaded_file)
+    except Exception as e:
+        message = "Failed to decompress " + to_download + " - " + e
+        WorkLogger.error_log(message, error_log)
+
+    for line in re.finditer(r'.+', decompressed.decode('utf-8')):
+        yield parse(line, success_log=success_log, error_log=error_log)
+
+    WorkLogger.success_log("Downloaded and parsed " + to_download, success_log)
 
 def store(record, date, db, read_default_file, host="localhost", port=3306,
           success_log="success_log.txt", error_log="error_log.txt"):
