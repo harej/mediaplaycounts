@@ -68,7 +68,7 @@ def download(date, success_log="success_log.txt", error_log="error_log.txt"):
         WorkLogger.error_log(message, error_log)
 
     for line in re.finditer(r'.+', decompressed.decode('utf-8')):
-        yield parse(line, success_log=success_log, error_log=error_log)
+        yield parse(line.group(0), success_log=success_log, error_log=error_log)
 
     WorkLogger.success_log("Downloaded and parsed " + to_download, success_log)
 
