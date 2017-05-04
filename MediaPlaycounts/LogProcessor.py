@@ -33,13 +33,12 @@ def download(date, success_log="success_log.txt", error_log="error_log.txt"):
         message = "Failed to decompress " + to_download + " - " + e
         WorkLogger.error_log(message, error_log)
 
-    WorkLogger.success_log("Downloaded " + to_download, success_log)
-
     decompressed = decompressed.decode('utf-8').split('\n')
 
     for line in decompressed:
         yield line
 
+    WorkLogger.success_log("Downloaded and parsed " + to_download, success_log)
 
 def parse(row, success_log="success_log.txt", error_log="error_log.txt"):
     """
