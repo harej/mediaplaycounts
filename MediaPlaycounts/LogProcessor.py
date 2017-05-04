@@ -35,51 +35,45 @@ def download(date, success_log="success_log.txt", error_log="error_log.txt"):
 
     WorkLogger.success_log("Downloaded " + to_download, success_log)
 
-    return decompressed.decode('utf-8')
+    decompressed = decompressed.decode('utf-8').split('\n')
+
+    for line in decompressed:
+        yield line
 
 
-def parse(raw_feed, success_log="success_log.txt", error_log="error_log.txt"):
+def parse(row, success_log="success_log.txt", error_log="error_log.txt"):
     """
-    Takes a raw, decompressed log file in string form, and returns a dictionary
-    (file: count)
+    Takes a line from a raw, decompressed log file and returns a tuple
+    (filename, playcount)
     """
-
-    result = []
 
     ext_regex = re.compile('.*\.(mid|ogg|ogv|wav|webm|flac|oga)')
 
-    spreadsheet = raw_feed.split("\n")
-    for row in spreadsheet:
-        columns = row.split("\t")
-        if len(columns) < 2:  # Not a real row
-            continue
-        base_name = columns[0]
+    columns = row.split("\t")
+    if len(columns) < 2:  # Not a real row
+        return
+    base_name = columns[0]
 
-        if columns[3] == '-':
-            columns[3] = 0
-        if columns[4] == '-':
-            columns[4] = 0
-        if columns[16] == '-':
-            columns[16] = 0
+    if columns[3] == '-':
+        columns[3] = 0
+    if columns[4] == '-':
+        columns[4] = 0
+    if columns[16] == '-':
+        columns[16] = 0
 
-        playcount = int(columns[3]) + int(columns[4]) + int(columns[16])
+    playcount = int(columns[3]) + int(columns[4]) + int(columns[16])
 
 
-        # First we must determine if this is a media file
-        components = base_name.split("/")
+    # First we must determine if this is a media file
+    components = base_name.split("/")
 
-        # /wikipedia/commons/x/xx/FILENAME
-        if len(components) == 6:
-            if components[1] == "wikipedia" and components[2] == "commons":
-                if len(components[3]) == 1 and len(components[4]) == 2:
-                    filename = urllib.parse.unquote_plus(components[5])
-                    if re.match(ext_regex, filename) != None:
-                        result.append((filename, int(playcount)))
-
-    WorkLogger.success_log("Parsed log and generated " + str(len(result)) +
-                           " records", success_log)
-
-    return result
+    # /wikipedia/commons/x/xx/FILENAME
+    if len(components) == 6:
+        if components[1] == "wikipedia" and components[2] == "commons":
+            if len(components[3]) == 1 and len(components[4]) == 2:
+                filename = urllib.parse.unquote_plus(components[5])
+                if re.match(ext_regex, filename) != None:
+                    return (filename, int(playcount))
 
 def store(record, date, db, read_default_file, host="localhost", port=3306,
           success_log="success_log.txt", error_log="error_log.txt"):
@@ -126,7 +120,6 @@ def store(record, date, db, read_default_file, host="localhost", port=3306,
         conn.commit()
         conn.close()
 
-    WorkLogger.success_log("Added " + str(len(record)) + " records to database",
-                           success_log)
+    WorkLogger.success_log("Added " + str(len(record)) + " records to database", success_log)
 
     return True

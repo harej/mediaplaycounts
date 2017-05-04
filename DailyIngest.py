@@ -9,9 +9,12 @@ def run(read_default_file, db="mediaplaycounts",
     """
 
     for date in dates:
+        record = []
         date_string = date.format('YYYY-MM-DD')
-        raw_log = LogProcessor.download(date)
-        record = LogProcessor.parse(raw_log)
+        for logline in LogProcessor.download(date):
+            parsed = LogProcessor.parse(logline)
+            if parsed is not None:
+                record.append(parsed)
         LogProcessor.store(record, date, db, read_default_file, host, port)
 
 if __name__ == '__main__':
