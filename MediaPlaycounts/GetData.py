@@ -148,7 +148,7 @@ def file_playcount(filename, start_date=None, end_date=None, last=None):
     for triplet in data:
         total += triplet['count']
 
-    return {'filename': filename, 'total': total 'details': data}
+    return {'filename': filename, 'total': total, 'details': data}
 
 def category_playcount(category, depth=9, start_date=None, end_date=None, last=None):
     """
