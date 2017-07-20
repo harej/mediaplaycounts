@@ -1,7 +1,8 @@
 import arrow
 import pymysql
 import re
-import config
+import redis
+from . import config
 
 REDIS = redis.Redis(host=config.REDIS_HOST, port=config.REDIS_PORT)
 success_log = config.SUCCESS_LOG
