@@ -141,9 +141,12 @@ def file_playcount(filename, start_date=None, end_date=None, last=None):
     filename = filename.replace(' ', '_')
     for date in date_range:
         date_string = date.format('YYYYMMDD')
+        count = REDIS.hget('mpc:' + filename, date_string)
+        if count is None:
+            count = 0
         data.append(
             {"date": date_string,
-             "count": REDIS.hget('mpc:' + filename, date_string)})
+             "count": count})
 
     total = 0
     for triplet in data:
