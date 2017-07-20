@@ -6,3 +6,4 @@ testfiles/*
 __pycache__/*
 MediaPlaycounts/__pycache__/*
 .my.cnf
+config.py
