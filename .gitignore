@@ -7,3 +7,5 @@ __pycache__/*
 MediaPlaycounts/__pycache__/*
 .my.cnf
 config.py
+MediaPlaycounts/error_log.txt
+MediaPlaycounts/success_log.txt
