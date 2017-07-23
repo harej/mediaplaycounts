@@ -42,7 +42,7 @@ def _date_ranger(start_date=None, end_date=None, last=None):
     """
 
     if end_date is None:
-        arrow.utcnow().replace(days=-1)
+        end_date = arrow.utcnow().replace(days=-1)
     else:
         end_date = arrow.get(end_date, 'YYYYMMDD')
 
@@ -50,7 +50,7 @@ def _date_ranger(start_date=None, end_date=None, last=None):
         start_date = arrow.get(start_date, 'YYYYMMDD')
     elif last is not None:
         amount = (last * -1) + 1
-        start_date = end_date.replace(days=amount).format('YYYYMMDD')
+        start_date = end_date.replace(days=amount)
     else:
         start_date = end_date
 
@@ -144,6 +144,8 @@ def file_playcount(filename, start_date=None, end_date=None, last=None):
         count = REDIS.hget('mpc:' + filename, date_string)
         if count is None:
             count = 0
+        else:
+            count = int(count.decode('utf-8'))
         data.append(
             {"date": date_string,
              "count": count})
