@@ -13,6 +13,7 @@ success_log = config.SUCCESS_LOG
 error_log = config.ERROR_LOG
 DATE_REGEX = re.compile('^\d{4}-\d{2}-\d{2}$')
 
+
 def parse(row):
     """
     Takes a line from a raw, decompressed log file and returns a tuple
@@ -47,6 +48,7 @@ def parse(row):
                     if re.match(ext_regex, filename) is not None:
                         return (filename, int(playcount))
 
+
 def download(date):
     """
     Downloads, decompresses, and parses a Mediacounts logfile from dumps.wikimedia.org
@@ -80,6 +82,7 @@ def download(date):
 
     WorkLogger.success_log("Processed " + to_download, success_log)
 
+
 def store(record, date):
     """
     Takes the output of the parse function (the output here being referred to as
@@ -94,13 +97,15 @@ def store(record, date):
 
     return True
 
+
 def generate_dates(begin=arrow.get('2015-01-01'), end=arrow.utcnow()):
     """
     Returns a list of Arrow date objects for each day since 1 January 2015 when
     these logs begin.
     """
     return arrow.Arrow.range('day', begin, end)
-    
+
+
 def run(dates=[arrow.utcnow().replace(days=-1)]):
     """
     Runs through the LogProcessor for the dates specified. Dates must be Arrow
@@ -114,6 +119,7 @@ def run(dates=[arrow.utcnow().replace(days=-1)]):
         for line in download(date):
             if line is not None:
                 store([line], date)
+
 
 def process_args(args):
     """
@@ -155,6 +161,7 @@ def process_args(args):
 
     else:
         raise RuntimeError('You put down too many parameters, dude')
+
 
 if __name__ == '__main__':
     args = sys.argv[1:]

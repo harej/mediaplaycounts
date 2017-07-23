@@ -8,6 +8,7 @@ REDIS = redis.Redis(host=config.REDIS_HOST, port=config.REDIS_PORT)
 success_log = config.SUCCESS_LOG
 error_log = config.ERROR_LOG
 
+
 def _query_commons(query, params):
     """
     Helper function to perform database queries
@@ -35,6 +36,7 @@ def _query_commons(query, params):
 
     return data
 
+
 def _date_ranger(start_date=None, end_date=None, last=None):
     """
     Helper function to take whatever date input the user gives and turn it into
@@ -56,6 +58,7 @@ def _date_ranger(start_date=None, end_date=None, last=None):
 
     return arrow.Arrow.range('day', start_date, end_date)
 
+
 def _find_subcategories(category, depth=9):
     """
     Finds subcategories of a given category up to the provided depth. Category
@@ -67,8 +70,9 @@ def _find_subcategories(category, depth=9):
 
     categorylist = []
 
-    query = ("select page_title from categorylinks join page on cl_from = page_id"
-             " where cl_to = %s and cl_type = 'subcat'")
+    query = (
+        "select page_title from categorylinks join page on cl_from = page_id"
+        " where cl_to = %s and cl_type = 'subcat'")
     params = (category.replace(" ", "_"))
 
     results = _query_commons(query, params)
@@ -76,13 +80,14 @@ def _find_subcategories(category, depth=9):
     for result in results:
         val = result[0].decode('utf-8')
         categorylist.append(val)
-        more = _find_subcategories(val, depth=depth-1)
+        more = _find_subcategories(val, depth=depth - 1)
         if more != None:
             for more_result in more:
                 categorylist.append(more_result)
 
     categorylist = sorted(list(set(categorylist)))
     return categorylist
+
 
 def _find_media_files(category):
     """
@@ -109,6 +114,7 @@ def _find_media_files(category):
 
     return filelist
 
+
 def _recursive_file_finder(category, depth=9):
     """
     Recursively goes through categories (up to the depth provided) and produces
@@ -129,13 +135,15 @@ def _recursive_file_finder(category, depth=9):
 
     return sorted(list(set(manifest)))
 
+
 def file_playcount(filename, start_date=None, end_date=None, last=None):
     """
     Returns play count information for a single file, either on a specific date,
     a range of dates, or in the last X days.
     """
 
-    date_range = _date_ranger(start_date=start_date, end_date=end_date, last=last)
+    date_range = _date_ranger(
+        start_date=start_date, end_date=end_date, last=last)
 
     data = []
     filename = filename.replace(' ', '_')
@@ -146,9 +154,7 @@ def file_playcount(filename, start_date=None, end_date=None, last=None):
             count = 0
         else:
             count = int(count.decode('utf-8'))
-        data.append(
-            {"date": date_string,
-             "count": count})
+        data.append({"date": date_string, "count": count})
 
     total = 0
     for triplet in data:
@@ -156,7 +162,12 @@ def file_playcount(filename, start_date=None, end_date=None, last=None):
 
     return {'filename': filename, 'total': total, 'details': data}
 
-def category_playcount(category, depth=9, start_date=None, end_date=None, last=None):
+
+def category_playcount(category,
+                       depth=9,
+                       start_date=None,
+                       end_date=None,
+                       last=None):
     """
     Returns play count information for a category of files, up to the specified
     level of category recursion, either on a specific date, a range of dates, or
@@ -167,10 +178,17 @@ def category_playcount(category, depth=9, start_date=None, end_date=None, last=N
 
     data = []
     for file in manifest:
-        data.append(file_playcount(file, start_date=start_date, end_date=end_date, last=last))
+        data.append(
+            file_playcount(
+                file, start_date=start_date, end_date=end_date, last=last))
 
     total = 0
     for block in data:
         total += block['total']
 
-    return {'category': category, 'depth': depth, 'total': total, 'details': data}
+    return {
+        'category': category,
+        'depth': depth,
+        'total': total,
+        'details': data
+    }
