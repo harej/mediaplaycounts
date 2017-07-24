@@ -3,6 +3,7 @@ import pymysql
 import re
 import redis
 from . import config
+from collections import OrderedDict
 
 REDIS = redis.Redis(host=config.REDIS_HOST, port=config.REDIS_PORT)
 success_log = config.SUCCESS_LOG
@@ -139,28 +140,39 @@ def _recursive_file_finder(category, depth=9):
 def file_playcount(filename, start_date=None, end_date=None, last=None):
     """
     Returns play count information for a single file, either on a specific date,
-    a range of dates, or in the last X days.
+    a range of dates, in the last X days, or all-time by having all the keyword
+    parameters set to None.
     """
-
-    date_range = _date_ranger(
-        start_date=start_date, end_date=end_date, last=last)
 
     data = []
     filename = filename.replace(' ', '_')
-    for date in date_range:
-        date_string = date.format('YYYYMMDD')
-        count = REDIS.hget('mpc:' + filename, date_string)
-        if count is None:
-            count = 0
-        else:
+
+    if start_date is None and end_date is None and last is None:
+        everything = REDIS.hgetall('mpc:' + filename)
+        for date_string, count in everything.items():
+            date_string = date_string.decode('utf-8')
             count = int(count.decode('utf-8'))
-        data.append({"date": date_string, "count": count})
+            data.append({'date': date_string, 'count': count})
+    else:
+        date_range = _date_ranger(
+            start_date=start_date, end_date=end_date, last=last)
+        for date in date_range:
+            date_string = date.format('YYYYMMDD')
+            count = REDIS.hget('mpc:' + filename, date_string)
+            if count is None:
+                count = 0
+            else:
+                count = int(count.decode('utf-8'))
+            data.append({'date': date_string, 'count': count})
 
     total = 0
     for triplet in data:
         total += triplet['count']
 
-    return {'filename': filename, 'total': total, 'details': data}
+    data = sorted(data, key=lambda k: k['date'])
+
+    return OrderedDict(
+        [('filename', filename), ('total', total), ('details', data)])
 
 
 def category_playcount(category,
@@ -182,13 +194,15 @@ def category_playcount(category,
             file_playcount(
                 file, start_date=start_date, end_date=end_date, last=last))
 
+    data = sorted(data, key=lambda k: k['filename'])
+
     total = 0
     for block in data:
         total += block['total']
 
-    return {
-        'category': category,
-        'depth': depth,
-        'total': total,
-        'details': data
-    }
+    return OrderedDict([
+        ('category', category),
+        ('depth', depth),
+        ('total', total),
+        ('details', data)
+    ])
