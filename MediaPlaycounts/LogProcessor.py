@@ -120,6 +120,16 @@ def run(dates=[arrow.utcnow().replace(days=-1)]):
             if line is not None:
                 store([line], date)
 
+def delete_date(affected_date):
+    """
+    Deletes all values for a given date
+    """
+
+    date_string = affected_date.format('YYYYMMDD')
+
+    for entry in REDIS.keys('mpc:*'):
+        REDIS.hdel(entry, date_string)
+
 
 def process_args(args):
     """
@@ -145,19 +155,29 @@ def process_args(args):
 
     elif len(args) == 2:
         # Two arguments: add data for the given date range
-        if re.match(DATE_REGEX, args[0]) is None:
-            raise ValueError('Invalid input: ' + args[0])
-        if re.match(DATE_REGEX, args[1]) is None:
-            raise ValueError('Invalid input: ' + args[1])
+        # Unless the first word is "delete"
 
-        if args[0] > args[1]:
-            raise ValueError('The first date must be before the second date')
+        if args[0] == 'delete':
+            if re.match(DATE_REGEX, args[1]) is None:
+                raise ValueError('Invalid input: ' + args[1])
 
-        begin = arrow.get(args[0])
-        end = arrow.get(args[1])
+            affected_date = arrow.get(args[1])
+            delete_date(affected_date)
 
-        date_range = generate_dates(begin, end)
-        run(date_range)
+        else:
+            if re.match(DATE_REGEX, args[0]) is None:
+                raise ValueError('Invalid input: ' + args[0])
+            if re.match(DATE_REGEX, args[1]) is None:
+                raise ValueError('Invalid input: ' + args[1])
+
+            if args[0] > args[1]:
+                raise ValueError('The first date must be before the second date')
+
+            begin = arrow.get(args[0])
+            end = arrow.get(args[1])
+
+            date_range = generate_dates(begin, end)
+            run(date_range)
 
     else:
         raise RuntimeError('You put down too many parameters, dude')
