@@ -18,7 +18,7 @@ def _get_manifest():
 
 
 def _get_video_id(file):
-    cached = REDIS.get('com2yt:' + file)
+    cached = h.redis.get('com2yt:' + file)
     if cached is not None:
         return cached
     else:
@@ -29,7 +29,7 @@ def _get_video_id(file):
             if template.name == 'From YouTube':
                 try:
                     ret = str(template.get(1).value)
-                    REDIS.set('com2yt:' + file, ret)
+                    h.redis.set('com2yt:' + file, ret)
                     return ret
                 except:
                     return None
