@@ -1,5 +1,6 @@
 import arrow, mwparserfromhell, pywikibot, requests
 from helper import Helper
+from pprint import pprint
 
 h = Helper()
 s = requests.Session()
@@ -22,7 +23,7 @@ def _get_video_id(file):
     templates = parsed.filter_templates()
     for template in templates:
         if template.name == 'From YouTube':
-            return template.get(1).value
+            return str(template.get(1).value)
 
 
 def _get_youtube_data(video_id):
@@ -32,10 +33,15 @@ def _get_youtube_data(video_id):
         'key': h.settings['google_api']
     }
 
-    r = s.get('https://www.googleapis.com/youtube/v3/videos', params=params)
-    timestamp = arrow.utcnow().format('YYYYMMDDHHmmss')
-    r = r.json()
-    return (r['items'][0]['statistics']['viewCount'], timestamp)
+    try:
+        r = s.get('https://www.googleapis.com/youtube/v3/videos', params=params)
+        timestamp = arrow.utcnow().format('YYYYMMDDHHmmss')
+        r = r.json()
+        return (r['items'][0]['statistics']['viewCount'], timestamp)
+    except Exception as e:
+        pprint(r)
+        h.error_log(str(e))
+        raise e
 
 
 def _store_in_redis(video_id, timestamp, view_count):
