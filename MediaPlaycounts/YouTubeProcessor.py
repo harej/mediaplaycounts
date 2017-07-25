@@ -40,7 +40,7 @@ def _get_youtube_data(video_id):
         return (r['items'][0]['statistics']['viewCount'], timestamp)
     except Exception as e:
         pprint(r)
-        h.error_log(str(e))
+        h.error_log('YouTube Processor choked on: ' + video_id)
         raise e
 
 
