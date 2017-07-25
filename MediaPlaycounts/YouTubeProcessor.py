@@ -23,7 +23,10 @@ def _get_video_id(file):
     templates = parsed.filter_templates()
     for template in templates:
         if template.name == 'From YouTube':
-            return str(template.get(1).value)
+            try:
+                return str(template.get(1).value)
+            except:
+                return None
 
 
 def _get_youtube_data(video_id):
