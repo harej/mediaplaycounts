@@ -38,9 +38,9 @@ def _get_youtube_data(video_id):
             'https://www.googleapis.com/youtube/v3/videos', params=params)
         timestamp = arrow.utcnow().format('YYYYMMDDHHmmss')
         r = r.json()
-        if len(r['items']) > 0:
+        try:
             return (r['items'][0]['statistics']['viewCount'], timestamp)
-        else:
+        except:
             return (None, timestamp)
     except Exception as e:
         pprint(r)
