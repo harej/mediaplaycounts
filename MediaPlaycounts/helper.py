@@ -1,4 +1,9 @@
-import arrow, redis, config, pymysql
+import arrow, redis, pymysql
+
+try:
+    from . import config
+except:
+    import config
 
 
 class Helper:
