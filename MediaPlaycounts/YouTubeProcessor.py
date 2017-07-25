@@ -18,15 +18,21 @@ def _get_manifest():
 
 
 def _get_video_id(file):
-    page = pywikibot.Page(site, 'File:' + file)
-    parsed = mwparserfromhell.parse(page.text)
-    templates = parsed.filter_templates()
-    for template in templates:
-        if template.name == 'From YouTube':
-            try:
-                return str(template.get(1).value)
-            except:
-                return None
+    cached = REDIS.get('com2yt:' + file)
+    if cached is not None:
+        return cached
+    else:
+        page = pywikibot.Page(site, 'File:' + file)
+        parsed = mwparserfromhell.parse(page.text)
+        templates = parsed.filter_templates()
+        for template in templates:
+            if template.name == 'From YouTube':
+                try:
+                    ret = str(template.get(1).value)
+                    REDIS.set('com2yt:' + file, ret)
+                    return ret
+                except:
+                    return None
 
 
 def _get_youtube_data(video_id):
