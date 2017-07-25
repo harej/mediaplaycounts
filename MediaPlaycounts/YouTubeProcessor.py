@@ -55,9 +55,10 @@ def run():
         print('Processing: ' + file)
         try:
             video_id = _get_video_id(file)
-            view_count, timestamp = _get_youtube_data(video_id)
-            _store_in_redis(video_id, timestamp, view_count)
-            processed += 1
+            if video_id is not None:
+                view_count, timestamp = _get_youtube_data(video_id)
+                _store_in_redis(video_id, timestamp, view_count)
+                processed += 1
         except Exception as e:
             h.error_log(str(e))
             raise e
