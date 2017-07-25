@@ -34,11 +34,14 @@ def _get_youtube_data(video_id):
     }
 
     try:
-        r = s.get('https://www.googleapis.com/youtube/v3/videos', params=params)
+        r = s.get(
+            'https://www.googleapis.com/youtube/v3/videos', params=params)
         timestamp = arrow.utcnow().format('YYYYMMDDHHmmss')
         r = r.json()
         if len(r['items']) > 0:
             return (r['items'][0]['statistics']['viewCount'], timestamp)
+        else:
+            return (None, timestamp)
     except Exception as e:
         pprint(r)
         h.error_log('YouTube Processor choked on: ' + video_id)
@@ -58,8 +61,9 @@ def run():
             video_id = _get_video_id(file)
             if video_id is not None:
                 view_count, timestamp = _get_youtube_data(video_id)
-                _store_in_redis(video_id, timestamp, view_count)
-                processed += 1
+                if view_count is not None:
+                    _store_in_redis(video_id, timestamp, view_count)
+                    processed += 1
         except Exception as e:
             h.error_log(str(e))
             raise e
