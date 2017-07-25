@@ -41,19 +41,20 @@ def _store_in_redis(video_id, timestamp, view_count):
 
 def run():
     manifest = _get_manifest()
-
+    processed = 0
     for file in manifest:
         print('Processing: ' + file)
         try:
             video_id = _get_video_id(file)
             view_count, timestamp = _get_youtube_data(video_id)
             _store_in_redis(video_id, timestamp, view_count)
+            processed += 1
         except Exception as e:
             WorkLogger.error_log(str(e), error_log)
             raise e
-
-    log_msg = 'Processed ' + str(len(manifest)) + ' YouTube videos'
-    WorkLogger.success_log(log_msg, success_log)
+        finally:
+            log_msg = 'Processed ' + str(processed) + ' YouTube videos'
+            WorkLogger.success_log(log_msg, success_log)
 
 
 if __name__ == '__main__':
