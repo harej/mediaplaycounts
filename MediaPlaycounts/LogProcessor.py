@@ -13,7 +13,7 @@ def parse(row):
 
     ext_regex = re.compile('.*\.(mid|ogg|ogv|wav|webm|flac|oga)')
 
-    columns = row.split("\t")
+    columns = row.split('\t')
     if len(columns) < 2:  # Not a real row
         return
     base_name = columns[0]
@@ -29,11 +29,11 @@ def parse(row):
 
     if playcount > 0:
         # First we must determine if this is a media file
-        components = base_name.split("/")
+        components = base_name.split('/')
 
         # /wikipedia/commons/x/xx/FILENAME
         if len(components) == 6:
-            if components[1] == "wikipedia" and components[2] == "commons":
+            if components[1] == 'wikipedia' and components[2] == 'commons':
                 if len(components[3]) == 1 and len(components[4]) == 2:
                     filename = urllib.parse.unquote_plus(components[5])
                     if re.match(ext_regex, filename) is not None:
@@ -47,31 +47,27 @@ def download(date):
     Requires an Arrow date object.
     Yields a parsed line
     """
-    root_url = "https://dumps.wikimedia.org/other/mediacounts/daily/"
-    filename = "mediacounts.{0}.v00.tsv.bz2"
+    root_url = 'https://dumps.wikimedia.org/other/mediacounts/daily/'
     date_string = date.format('YYYY-MM-DD')
     year_string = date.format('YYYY')
+    filename = 'mediacounts.{0}.v00.tsv.bz2'.format(date_string)
 
-    to_download = root_url + year_string + "/" + filename.format(date_string)
+    to_download = root_url + year_string + '/' + filename
 
     try:
-        downloaded_file = requests.get(to_download).content
+        with open('/tmp/' + filename, 'wb') as f:
+            f.write(requests.get(to_download).content)
+        h.success_log('Downloaded: ' + to_download)
     except Exception as e:
-        message = "Failed to download " + to_download + " - " + str(e)
+        message = 'Failed to download ' + to_download + '' - '' + str(e)
         h.error_log(message)
         raise RuntimeError(message)
 
-    try:
-        decompressed = bz2.decompress(downloaded_file)
-    except Exception as e:
-        message = "Failed to decompress " + to_download + " - " + str(e)
-        h.error_log(message)
-        raise RuntimeError(message)
+    with bz2.open('/tmp/' + filename) as f:
+        for line in f:
+            yield line.decode('utf-8')
 
-    for line in re.finditer(r'.+', decompressed.decode('utf-8')):
-        yield parse(line.group(0))
-
-    h.success_log("Processed " + to_download)
+    h.success_log('Processed ' + to_download)
 
 
 def store(record, date):
@@ -98,8 +94,9 @@ def run(dates=[arrow.utcnow().replace(days=-1)]):
     for date in dates:
         record = []
         date_string = date.format('YYYY-MM-DD')
-        print("Processing: " + date_string)
+        print('Processing: ' + date_string)
         for line in download(date):
+            line = parse(line)
             if line is not None:
                 store([line], date)
 
@@ -111,8 +108,14 @@ def delete_date(affected_date):
 
     date_string = affected_date.format('YYYYMMDD')
 
-    for entry in h.redis.keys('mpc:*'):
-        h.redis.hdel(entry, date_string)
+    try:
+        for entry in h.redis.keys('mpc:*'):
+            h.redis.hdel(entry, date_string)
+        h.success_log('Deleted entries for: ' + date_string)
+    except Exception as e:
+        message = 'Failed to delete entries for ' + date_string + ': ' + str(e)
+        h.error_log(message)
+        raise e
 
 
 def process_args(args):
@@ -146,14 +149,13 @@ def process_args(args):
             if re.match(DATE_REGEX, args[1]) is None:
                 raise ValueError('Invalid input: ' + args[1])
 
-            affected_date = arrow.get(args[1])
+            affected_date = arrow.get(args[1], 'YYYYMMDD')
             delete_date(affected_date)
 
         else:
-            if re.match(DATE_REGEX, args[0]) is None:
-                raise ValueError('Invalid input: ' + args[0])
-            if re.match(DATE_REGEX, args[1]) is None:
-                raise ValueError('Invalid input: ' + args[1])
+            for arg in args:
+                if re.match(DATE_REGEX, arg) is None:
+                    raise ValueError('Invalid input: ' + arg)
 
             if args[0] > args[1]:
                 raise ValueError(
