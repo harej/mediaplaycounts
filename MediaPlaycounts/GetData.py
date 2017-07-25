@@ -163,7 +163,7 @@ def file_playcount(filename, start_date=None, end_date=None, last=None):
                 count = 0
             else:
                 count = int(count.decode('utf-8'))
-            data.append({'date': date_string, 'count': count})
+            data.append(OrderedDict([('date', date_string), ('count', count)]))
 
     total = 0
     for triplet in data:
@@ -171,8 +171,8 @@ def file_playcount(filename, start_date=None, end_date=None, last=None):
 
     data = sorted(data, key=lambda k: k['date'])
 
-    return OrderedDict(
-        [('filename', filename), ('total', total), ('details', data)])
+    return OrderedDict([('filename', filename), ('total', total), ('details',
+                                                                   data)])
 
 
 def category_playcount(category,
@@ -200,9 +200,5 @@ def category_playcount(category,
     for block in data:
         total += block['total']
 
-    return OrderedDict([
-        ('category', category),
-        ('depth', depth),
-        ('total', total),
-        ('details', data)
-    ])
+    return OrderedDict([('category', category), ('depth', depth),
+                        ('total', total), ('details', data)])

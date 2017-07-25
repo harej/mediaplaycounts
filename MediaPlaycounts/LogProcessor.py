@@ -120,6 +120,7 @@ def run(dates=[arrow.utcnow().replace(days=-1)]):
             if line is not None:
                 store([line], date)
 
+
 def delete_date(affected_date):
     """
     Deletes all values for a given date
@@ -171,7 +172,8 @@ def process_args(args):
                 raise ValueError('Invalid input: ' + args[1])
 
             if args[0] > args[1]:
-                raise ValueError('The first date must be before the second date')
+                raise ValueError(
+                    'The first date must be before the second date')
 
             begin = arrow.get(args[0])
             end = arrow.get(args[1])
