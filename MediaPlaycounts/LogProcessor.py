@@ -135,7 +135,7 @@ def process_args(args):
         elif re.match(DATE_REGEX, args[0]) is None:
             raise ValueError('Invalid input: ' + args[0])
 
-        day = [arrow.get(args[0])]
+        day = [arrow.get(args[0], 'YYYYMMDD')]
         run(dates=day)
 
     elif len(args) == 2:
