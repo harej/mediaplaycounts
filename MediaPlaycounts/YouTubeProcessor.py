@@ -37,7 +37,8 @@ def _get_youtube_data(video_id):
         r = s.get('https://www.googleapis.com/youtube/v3/videos', params=params)
         timestamp = arrow.utcnow().format('YYYYMMDDHHmmss')
         r = r.json()
-        return (r['items'][0]['statistics']['viewCount'], timestamp)
+        if len(r['items']) > 0:
+            return (r['items'][0]['statistics']['viewCount'], timestamp)
     except Exception as e:
         pprint(r)
         h.error_log('YouTube Processor choked on: ' + video_id)
