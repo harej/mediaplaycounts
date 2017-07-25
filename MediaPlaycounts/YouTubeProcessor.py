@@ -1,10 +1,9 @@
-import arrow, mwparserfromhell, pywikibot, requests, redis, GetData, WorkLogger, config
+import arrow, mwparserfromhell, pywikibot, requests
+from helper import Helper
 
-REDIS = redis.Redis(host=config.REDIS_HOST, port=config.REDIS_PORT)
-success_log = config.SUCCESS_LOG
-error_log = config.ERROR_LOG
-site = pywikibot.Site()
+h = Helper()
 s = requests.Session()
+site = pywikibot.Site()
 
 
 def _get_manifest():
@@ -14,7 +13,7 @@ def _get_manifest():
          'where page_namespace = 6 and tl_namespace = 10 '
          'and tl_title = "From_YouTube";')
 
-    return [x[0].decode('utf-8') for x in GetData._query_commons(q, None)]
+    return [x[0].decode('utf-8') for x in h.query_commons(q, None)]
 
 
 def _get_video_id(file):
@@ -27,7 +26,11 @@ def _get_video_id(file):
 
 
 def _get_youtube_data(video_id):
-    params = {'part': 'statistics', 'id': video_id, 'key': config.GOOGLE_API}
+    params = {
+        'part': 'statistics',
+        'id': video_id,
+        'key': h.settings['google_api']
+    }
 
     r = s.get('https://www.googleapis.com/youtube/v3/videos', params=params)
     timestamp = arrow.utcnow().format('YYYYMMDDHHmmss')
@@ -36,7 +39,7 @@ def _get_youtube_data(video_id):
 
 
 def _store_in_redis(video_id, timestamp, view_count):
-    REDIS.hset('youtube:' + video_id, timestamp, view_count)
+    h.redis.hset('youtube:' + video_id, timestamp, view_count)
 
 
 def run():
@@ -50,11 +53,11 @@ def run():
             _store_in_redis(video_id, timestamp, view_count)
             processed += 1
         except Exception as e:
-            WorkLogger.error_log(str(e), error_log)
+            h.error_log(str(e))
             raise e
         finally:
             log_msg = 'Processed ' + str(processed) + ' YouTube videos'
-            WorkLogger.success_log(log_msg, success_log)
+            h.success_log(log_msg)
 
 
 if __name__ == '__main__':

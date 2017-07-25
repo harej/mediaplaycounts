@@ -1,63 +1,8 @@
-import arrow
-import pymysql
-import re
-import redis
-from . import config
+import arrow, re
+from helper import Helper
 from collections import OrderedDict
 
-REDIS = redis.Redis(host=config.REDIS_HOST, port=config.REDIS_PORT)
-success_log = config.SUCCESS_LOG
-error_log = config.ERROR_LOG
-
-
-def _query_commons(query, params):
-    """
-    Helper function to perform database queries
-    """
-
-    conn = pymysql.connect(
-        host=config.COMMONS_HOST,
-        port=config.COMMONS_PORT,
-        db=config.COMMONS_DB,
-        user=config.SQL_USER,
-        password=config.SQL_PASS,
-        charset="utf8")
-
-    cur = conn.cursor()
-    cur.execute(query, params)
-
-    data = []
-
-    if cur.rowcount > 0:
-        results = cur.fetchall()
-        for result in results:
-            data.append(result)
-
-    conn.close()
-
-    return data
-
-
-def _date_ranger(start_date=None, end_date=None, last=None):
-    """
-    Helper function to take whatever date input the user gives and turn it into
-    a range of Arrow objects
-    """
-
-    if end_date is None:
-        end_date = arrow.utcnow().replace(days=-1)
-    else:
-        end_date = arrow.get(end_date, 'YYYYMMDD')
-
-    if start_date is not None:
-        start_date = arrow.get(start_date, 'YYYYMMDD')
-    elif last is not None:
-        amount = (last * -1) + 1
-        start_date = end_date.replace(days=amount)
-    else:
-        start_date = end_date
-
-    return arrow.Arrow.range('day', start_date, end_date)
+h = Helper()
 
 
 def _find_subcategories(category, depth=9):
@@ -76,7 +21,7 @@ def _find_subcategories(category, depth=9):
         " where cl_to = %s and cl_type = 'subcat'")
     params = (category.replace(" ", "_"))
 
-    results = _query_commons(query, params)
+    results = h.query_commons(query, params)
 
     for result in results:
         val = result[0].decode('utf-8')
@@ -104,7 +49,7 @@ def _find_media_files(category):
          "where page_namespace=6 and cl_to = %s;")
 
     params = (category.replace(" ", "_"))
-    results = _query_commons(q, params)
+    results = h.query_commons(q, params)
     ext_regex = re.compile('.*\.(mid|ogg|ogv|wav|webm|flac|oga)')
     for result in results:
         filename = result[0].decode("utf-8")
@@ -148,17 +93,17 @@ def file_playcount(filename, start_date=None, end_date=None, last=None):
     filename = filename.replace(' ', '_')
 
     if start_date is None and end_date is None and last is None:
-        everything = REDIS.hgetall('mpc:' + filename)
+        everything = h.redis.hgetall('mpc:' + filename)
         for date_string, count in everything.items():
             date_string = date_string.decode('utf-8')
             count = int(count.decode('utf-8'))
             data.append({'date': date_string, 'count': count})
     else:
-        date_range = _date_ranger(
+        date_range = h.date_ranger(
             start_date=start_date, end_date=end_date, last=last)
         for date in date_range:
             date_string = date.format('YYYYMMDD')
-            count = REDIS.hget('mpc:' + filename, date_string)
+            count = h.redis.hget('mpc:' + filename, date_string)
             if count is None:
                 count = 0
             else:

@@ -1,17 +1,8 @@
-import arrow
-import bz2
-import re
-import requests
-import redis
-import sys
-import urllib.parse
-import WorkLogger
-import config
+import arrow, bz2, re, requests, sys, urllib.parse
+from helper import Helper
 
-REDIS = redis.Redis(host=config.REDIS_HOST, port=config.REDIS_PORT)
-success_log = config.SUCCESS_LOG
-error_log = config.ERROR_LOG
-DATE_REGEX = re.compile('^\d{4}-\d{2}-\d{2}$')
+h = Helper()
+DATE_REGEX = re.compile('^\d{8}$')
 
 
 def parse(row):
@@ -51,8 +42,8 @@ def parse(row):
 
 def download(date):
     """
-    Downloads, decompresses, and parses a Mediacounts logfile from dumps.wikimedia.org
-    and stores it in memory for parsing.
+    Downloads, decompresses, and parses a Mediacounts logfile from
+    dumps.wikimedia.org and stores it in memory for parsing.
     Requires an Arrow date object.
     Yields a parsed line
     """
@@ -67,20 +58,20 @@ def download(date):
         downloaded_file = requests.get(to_download).content
     except Exception as e:
         message = "Failed to download " + to_download + " - " + str(e)
-        WorkLogger.error_log(message, error_log)
+        h.error_log(message)
         raise RuntimeError(message)
 
     try:
         decompressed = bz2.decompress(downloaded_file)
     except Exception as e:
         message = "Failed to decompress " + to_download + " - " + str(e)
-        WorkLogger.error_log(message, error_log)
+        h.error_log(message)
         raise RuntimeError(message)
 
     for line in re.finditer(r'.+', decompressed.decode('utf-8')):
         yield parse(line.group(0))
 
-    WorkLogger.success_log("Processed " + to_download, success_log)
+    h.success_log("Processed " + to_download)
 
 
 def store(record, date):
@@ -93,17 +84,9 @@ def store(record, date):
     date_string = date.format('YYYYMMDD')
 
     for pair in record:
-        REDIS.hincrby('mpc:' + pair[0], date_string, amount=pair[1])
+        h.redis.hincrby('mpc:' + pair[0], date_string, amount=pair[1])
 
     return True
-
-
-def generate_dates(begin=arrow.get('2015-01-01'), end=arrow.utcnow()):
-    """
-    Returns a list of Arrow date objects for each day since 1 January 2015 when
-    these logs begin.
-    """
-    return arrow.Arrow.range('day', begin, end)
 
 
 def run(dates=[arrow.utcnow().replace(days=-1)]):
@@ -128,8 +111,8 @@ def delete_date(affected_date):
 
     date_string = affected_date.format('YYYYMMDD')
 
-    for entry in REDIS.keys('mpc:*'):
-        REDIS.hdel(entry, date_string)
+    for entry in h.redis.keys('mpc:*'):
+        h.redis.hdel(entry, date_string)
 
 
 def process_args(args):
@@ -146,13 +129,14 @@ def process_args(args):
         # Unless that argument is "initial"
 
         if args[0] == 'initial':
-            run(generate_dates())
+            date_range = h.date_ranger(start_date='20150101')
+            run(date_range)
 
         elif re.match(DATE_REGEX, args[0]) is None:
             raise ValueError('Invalid input: ' + args[0])
 
-        day = arrow.get(args[0])
-        run(dates=[day])
+        day = [arrow.get(args[0])]
+        run(dates=day)
 
     elif len(args) == 2:
         # Two arguments: add data for the given date range
@@ -175,11 +159,8 @@ def process_args(args):
                 raise ValueError(
                     'The first date must be before the second date')
 
-            begin = arrow.get(args[0])
-            end = arrow.get(args[1])
-
-            date_range = generate_dates(begin, end)
-            run(date_range)
+            date_range = h.date_ranger(start_date=args[0], end_date=args[1])
+            run(dates=date_range)
 
     else:
         raise RuntimeError('You put down too many parameters, dude')
