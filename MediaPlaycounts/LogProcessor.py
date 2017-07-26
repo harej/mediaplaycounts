@@ -1,4 +1,4 @@
-import arrow, bz2, re, requests, sys, urllib.parse
+import arrow, bz2, os, re, requests, sys, urllib.parse
 from helper import Helper
 
 h = Helper()
@@ -59,7 +59,7 @@ def download(date):
             f.write(requests.get(to_download).content)
         h.success_log('Downloaded: ' + to_download)
     except Exception as e:
-        message = 'Failed to download ' + to_download + '' - '' + str(e)
+        message = 'Failed to download ' + to_download + ' - ' + str(e)
         h.error_log(message)
         raise RuntimeError(message)
 
@@ -85,6 +85,17 @@ def store(record, date):
     return True
 
 
+def delete_file(date):
+    """
+    Takes an Arrow date object and deletes the corresponding file from the /tmp
+    directory.
+    """
+
+    date_string = date.format('YYYY-MM-DD')
+    filename = 'mediacounts.{0}.v00.tsv.bz2'.format(date_string)
+    os.remove('/tmp/' + filename)
+
+
 def run(dates=[arrow.utcnow().replace(days=-1)]):
     """
     Runs through the LogProcessor for the dates specified. Dates must be Arrow
@@ -99,6 +110,7 @@ def run(dates=[arrow.utcnow().replace(days=-1)]):
             line = parse(line)
             if line is not None:
                 store([line], date)
+        delete_file(date)
 
 
 def delete_date(affected_date):
