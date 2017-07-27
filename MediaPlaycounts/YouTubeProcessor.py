@@ -20,7 +20,7 @@ def _get_manifest():
 def _get_video_id(file):
     cached = h.redis.get('com2yt:' + file)
     if cached is not None:
-        return cached
+        return cached.decode('utf-8')
     else:
         page = pywikibot.Page(site, 'File:' + file)
         parsed = mwparserfromhell.parse(page.text)
