@@ -1,4 +1,4 @@
-import arrow, redis, pymysql
+import arrow, redis, ssdb, pymysql
 
 try:
     from . import config
@@ -11,6 +11,8 @@ class Helper:
         self.settings = {
             'redis_host': config.REDIS_HOST,
             'redis_port': config.REDIS_PORT,
+            'ssdb_host': config.SSDB_HOST,
+            'ssdb_port': config.SSDB_PORT,
             'success_log': config.SUCCESS_LOG,
             'error_log': config.ERROR_LOG,
             'commons_host': config.COMMONS_HOST,
@@ -23,6 +25,9 @@ class Helper:
 
         self.redis = redis.Redis(
             host=self.settings['redis_host'], port=self.settings['redis_port'])
+
+        self.ssdb = ssdb.Client(
+            host=self.settings['ssdb_host'], port=self.settings['ssdb_port'])
 
     def success_log(self, message):
         timestamp = arrow.utcnow().format('YYYY-MM-DD HH:mm:ss')
