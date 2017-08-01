@@ -1,4 +1,4 @@
-import arrow, redis, ssdb, pymysql
+import arrow, redis, pyssdb, pymysql
 
 try:
     from . import config
@@ -26,7 +26,7 @@ class Helper:
         self.redis = redis.Redis(
             host=self.settings['redis_host'], port=self.settings['redis_port'])
 
-        self.ssdb = ssdb.Client(
+        self.ssdb = pyssdb.Client(
             host=self.settings['ssdb_host'], port=self.settings['ssdb_port'])
 
     def success_log(self, message):
