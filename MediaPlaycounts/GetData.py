@@ -172,7 +172,7 @@ def youtube_snapshot_file(filename, start_date=None, end_date=None, last=None):
         x.decode('utf-8'): int(y.decode('utf-8'))
         for x, y in play_counts.items()
     }
-    timestamps = list(play_counts.keys()).sorted(reverse=True)
+    timestamps = sorted(list(play_counts.keys()), reverse=True)
     latest_time = timestamps[0]
     latest_count = play_counts[latest_time]
     ret = OrderedDict([('filename', filename), ('count', latest_count),
@@ -249,7 +249,7 @@ def image_single_viewcount(filename, start_date=None, end_date=None,
             if actual_date not in dates:
                 dates[actual_date] = {'date': actual_date}
             dates[actual_date][metric_groups[metric_group]] = count
-        for date in list(dates.keys()).sorted():
+        for date in sorted(list(dates.keys())):
             to_append = OrderedDict([('date', date)])
             total = 0
             for group in metric_groups:
