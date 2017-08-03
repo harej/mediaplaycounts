@@ -237,7 +237,7 @@ def image_single_viewcount(filename, start_date=None, end_date=None,
 
     data = []
     filename = filename.replace(' ', '_')
-    filehash = hashlib.sha224(filename).hexdigest()
+    filehash = hashlib.sha224(filename.encode('utf-8')).hexdigest()
 
     if start_date is None and end_date is None and last is None:
         dates = {}
