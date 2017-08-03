@@ -219,7 +219,8 @@ def youtube_snapshot_category(category,
 
     total = 0
     for block in data:
-        total += block['count']
+        if 'count' in block:
+            total += block['count']
 
     return OrderedDict([('category', category), ('depth', depth),
                         ('total', total), ('details', data)])
