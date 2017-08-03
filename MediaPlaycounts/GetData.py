@@ -35,7 +35,7 @@ def _find_subcategories(category, depth=9):
     return categorylist
 
 
-def _find_media_files(category):
+def _find_media_files(category, mode='playable'):
     """
     Generates a list of media files for a single category. Use the _find_subcategories
     method to generate a list of subcategories to feed individually into this
@@ -53,7 +53,8 @@ def _find_media_files(category):
     ext_regex = re.compile('.*\.(mid|ogg|ogv|wav|webm|flac|oga)')
     for result in results:
         filename = result[0].decode("utf-8")
-        if re.match(ext_regex, filename) != None:
+        if (re.match(ext_regex, filename) is not None and mode == 'playable') \
+        or (re.match(ext_regex, filename) is None and mode == 'static'):
             filelist.append(filename)
 
     filelist.sort()
@@ -61,7 +62,7 @@ def _find_media_files(category):
     return filelist
 
 
-def _recursive_file_finder(category, depth=9):
+def _recursive_file_finder(category, depth, mode='playable'):
     """
     Recursively goes through categories (up to the depth provided) and produces
     a list of files.
@@ -69,13 +70,13 @@ def _recursive_file_finder(category, depth=9):
 
     manifest = []
 
-    root_list = _find_media_files(category)
+    root_list = _find_media_files(category, mode=mode)
     for entry in root_list:
         manifest.append(entry)
 
     subcat_list = _find_subcategories(category, depth=depth)
     for subcat in subcat_list:
-        subcat_file_list = _find_media_files(subcat)
+        subcat_file_list = _find_media_files(subcat, mode=mode)
         for entry in subcat_file_list:
             manifest.append(entry)
 
@@ -131,7 +132,7 @@ def category_playcount(category,
     in the last X days.
     """
 
-    manifest = _recursive_file_finder(category, depth=depth)
+    manifest = _recursive_file_finder(category, depth)
 
     data = []
     for file in manifest:
@@ -207,7 +208,7 @@ def youtube_snapshot_category(category,
     files.
     """
 
-    manifest = _recursive_file_finder(category, depth=depth)
+    manifest = _recursive_file_finder(category, depth)
 
     data = []
     for file in manifest:
@@ -306,7 +307,7 @@ def image_category_viewcount(category,
 
     metric_groups = ['original', '0-399', '400-799', '800+', 'total']
 
-    manifest = _recursive_file_finder(category, depth=depth)
+    manifest = _recursive_file_finder(category, depth, mode='static')
 
     data = []
     for file in manifest:
