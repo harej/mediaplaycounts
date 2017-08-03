@@ -148,6 +148,7 @@ def category_playcount(category,
     return OrderedDict([('category', category), ('depth', depth),
                         ('total', total), ('details', data)])
 
+
 def youtube_snapshot_file(filename, start_date=None, end_date=None, last=None):
     """
     Returns the total plays for a YouTube video, identified by its filename on
@@ -163,13 +164,18 @@ def youtube_snapshot_file(filename, start_date=None, end_date=None, last=None):
 
     if youtube_id is None:
         return {'filename': filename}
+    else:
+        youtube_id = youtube_id.decode('utf-8')
 
     play_counts = h.redis.hgetall('youtube:' + youtube_id)
+    play_counts = {
+        x.decode('utf-8'): int(y.decode('utf-8'))
+        for x, y in play_counts.items()
+    }
     timestamps = play_counts.keys().sorted(reverse=True)
     latest_time = timestamps[0]
     latest_count = play_counts[latest_time]
-    ret = OrderedDict([('filename', filename),
-                       ('count', latest_count),
+    ret = OrderedDict([('filename', filename), ('count', latest_count),
                        ('as_of', latest_time)])
 
     if start_date is None and end_date is None and last is None:
@@ -177,16 +183,19 @@ def youtube_snapshot_file(filename, start_date=None, end_date=None, last=None):
     else:
         details = []
         time_map = {timestamp[:8]: timestamp for timestamp in timestamps}
-        date_range = h.date_ranger(start_date=start_date, end_date=end_date,
-                                   last=last)
+        date_range = h.date_ranger(
+            start_date=start_date, end_date=end_date, last=last)
         for date in date_range:
             date_string = date.format('YYYYMMDD')
             timestamp = time_map[date_string]
             if timestamp in play_counts:
-                details.append({'count': play_counts[timestamp],
-                                'as_of': timestamp})
+                details.append({
+                    'count': play_counts[timestamp],
+                    'as_of': timestamp
+                })
         ret.update({'details': details})
         return ret
+
 
 def youtube_snapshot_category(category,
                               depth=9,
@@ -215,7 +224,9 @@ def youtube_snapshot_category(category,
     return OrderedDict([('category', category), ('depth', depth),
                         ('total', total), ('details', data)])
 
-def image_single_viewcount(filename, start_date=None, end_date=None, last=None):
+
+def image_single_viewcount(filename, start_date=None, end_date=None,
+                           last=None):
     """
     Returns view count data for static images, including drill-down metrics for
     loads of thumbnails and of the original images.
@@ -251,7 +262,7 @@ def image_single_viewcount(filename, start_date=None, end_date=None, last=None):
             data.append(to_append)
 
     else:
-        total = [0, 0, 0, 0] # corresponding to each metrics group
+        total = [0, 0, 0, 0]  # corresponding to each metrics group
         date_range = h.date_ranger(
             start_date=start_date, end_date=end_date, last=last)
         for date in date_range:
@@ -259,7 +270,8 @@ def image_single_viewcount(filename, start_date=None, end_date=None, last=None):
             to_append = OrderedDict([('date', date_string)])
             subtotal = 0
             for group_num, group_name in enumerate(metric_groups):
-                count = h.ssdb.hget('img:' + filehash, date_string + str(group_num))
+                count = h.ssdb.hget('img:' + filehash,
+                                    date_string + str(group_num))
                 if count is None:
                     count = 0
                 else:
@@ -274,13 +286,12 @@ def image_single_viewcount(filename, start_date=None, end_date=None, last=None):
 
     data = sorted(data, key=lambda k: k['date'])
 
-    return OrderedDict([('filename', filename),
-                        (metric_groups[0], total[0]),
+    return OrderedDict([('filename', filename), (metric_groups[0], total[0]),
                         (metric_groups[1], total[1]),
                         (metric_groups[2], total[2]),
                         (metric_groups[3], total[3]),
-                        ('total', total_total),
-                        ('details', data)])
+                        ('total', total_total), ('details', data)])
+
 
 def image_category_viewcount(category,
                              depth=9,
@@ -309,11 +320,8 @@ def image_category_viewcount(category,
         for group_num, group_name in enumerate(metric_groups):
             total[group_num] += block[group_name]
 
-    return OrderedDict([('category', category),
-                        ('depth', depth),
-                        (metric_groups[0], total[0]),
-                        (metric_groups[1], total[1]),
-                        (metric_groups[2], total[2]),
-                        (metric_groups[3], total[3]),
-                        (metric_groups[4], total[4]),
-                        ('details', data)])
+    return OrderedDict(
+        [('category', category), ('depth', depth),
+         (metric_groups[0], total[0]), (metric_groups[1], total[1]),
+         (metric_groups[2], total[2]), (metric_groups[3], total[3]),
+         (metric_groups[4], total[4]), ('details', data)])
