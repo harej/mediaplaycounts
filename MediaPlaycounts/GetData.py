@@ -243,6 +243,10 @@ def image_single_viewcount(filename, start_date=None, end_date=None,
     if start_date is None and end_date is None and last is None:
         dates = {}
         everything = h.ssdb.hgetall('img:' + filehash)
+        everything = {
+            everything[n]: everything[n + 1]
+            for n in range(0, len(everything), 2)
+        }
         for date_string, count in everything.items():
             date_string = date_string.decode('utf-8')
             actual_date = date_string[:8]
