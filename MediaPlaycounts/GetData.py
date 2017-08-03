@@ -250,7 +250,7 @@ def image_single_viewcount(filename, start_date=None, end_date=None,
         for date_string, count in everything.items():
             date_string = date_string.decode('utf-8')
             actual_date = date_string[:8]
-            metric_group = date_string[-1:]
+            metric_group = int(date_string[-1:])
             count = int(count.decode('utf-8'))
             if actual_date not in dates:
                 dates[actual_date] = {'date': actual_date}
